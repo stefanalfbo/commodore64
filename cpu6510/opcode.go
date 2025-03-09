@@ -4,6 +4,7 @@ var OP_CODE = map[string]byte{
 	"BRK": 0x00,
 	"CLC": 0x18,
 	"SEC": 0x38,
+	"CLI": 0x58,
 	"CLD": 0xD8,
 	"SED": 0xF8,
 }
@@ -29,6 +30,11 @@ func (c *CPU) CLC() {
 // SEC - SEt Carry
 func (c *CPU) SEC() {
 	c.statusRegister.carry = true
+}
+
+// CLI - CLear Interrupt disable flag
+func (c *CPU) CLI() {
+	c.statusRegister.interruptDisableFlag = false
 }
 
 // CLD - CLear Decimal flag

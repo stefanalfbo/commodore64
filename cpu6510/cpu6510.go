@@ -63,6 +63,8 @@ func (c *CPU) execute(instruction byte) {
 		c.CLC()
 	case 0x38:
 		c.SEC()
+	case 0x58:
+		c.CLI()
 	case 0xD8:
 		c.CLD()
 	case 0xF8:

@@ -30,66 +30,85 @@ func TestNewCPU(t *testing.T) {
 
 func TestStatusRegister(t *testing.T) {
 
-	t.Run("Clear the carry flag", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.statusRegister.carry = true
+	t.Run("Carry flag", func(t *testing.T) {
+		t.Run("Set the carry flag", func(t *testing.T) {
+			cpu := NewCPU()
 
-		cpu.execute(OP_CODE["CLC"])
+			cpu.execute(OP_CODE["SEC"])
 
-		if cpu.statusRegister.carry {
-			t.Errorf("Carry flag should be cleared")
-		}
+			if !cpu.statusRegister.carry {
+				t.Errorf("Carry flag should be set")
+			}
+		})
+
+		t.Run("Clear the carry flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.statusRegister.carry = true
+
+			cpu.execute(OP_CODE["CLC"])
+
+			if cpu.statusRegister.carry {
+				t.Errorf("Carry flag should be cleared")
+			}
+		})
 	})
 
-	t.Run("Set the carry flag", func(t *testing.T) {
-		cpu := NewCPU()
+	t.Run("Interrupt disable flag", func(t *testing.T) {
+		t.Run("Clear the interrupt disable flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.statusRegister.interruptDisableFlag = true
 
-		cpu.execute(OP_CODE["SEC"])
+			cpu.execute(OP_CODE["CLI"])
 
-		if !cpu.statusRegister.carry {
-			t.Errorf("Carry flag should be set")
-		}
+			if cpu.statusRegister.interruptDisableFlag {
+				t.Errorf("Interrupt disable flag should be cleared")
+			}
+		})
+
+		t.Run("Set the interrupt disable flag", func(t *testing.T) {
+			cpu := NewCPU()
+
+			cpu.execute(OP_CODE["BRK"])
+
+			if !cpu.statusRegister.interruptDisableFlag {
+				t.Errorf("Interrupt disable flag should be set")
+			}
+		})
 	})
 
-	t.Run("Set the interrupt disable flag", func(t *testing.T) {
-		cpu := NewCPU()
+	t.Run("Decimal mode flag", func(t *testing.T) {
+		t.Run("Clear the decimal mode flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.statusRegister.decimalModeFlag = true
 
-		cpu.execute(OP_CODE["BRK"])
+			cpu.execute(OP_CODE["CLD"])
 
-		if !cpu.statusRegister.interruptDisableFlag {
-			t.Errorf("Interrupt disable flag should be set")
-		}
+			if cpu.statusRegister.decimalModeFlag {
+				t.Errorf("Decimal mode flag should be cleared")
+			}
+		})
+
+		t.Run("Set the decimal mode flag", func(t *testing.T) {
+			cpu := NewCPU()
+
+			cpu.execute(OP_CODE["SED"])
+
+			if !cpu.statusRegister.decimalModeFlag {
+				t.Errorf("Decimal mode flag should be set")
+			}
+		})
 	})
 
-	t.Run("Clear the decimal mode flag", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.statusRegister.decimalModeFlag = true
+	t.Run("Break status flag", func(t *testing.T) {
+		t.Run("Set the break status flag", func(t *testing.T) {
+			cpu := NewCPU()
 
-		cpu.execute(OP_CODE["CLD"])
+			cpu.execute(OP_CODE["BRK"])
 
-		if cpu.statusRegister.decimalModeFlag {
-			t.Errorf("Decimal mode flag should be cleared")
-		}
-	})
-
-	t.Run("Set the decimal mode flag", func(t *testing.T) {
-		cpu := NewCPU()
-
-		cpu.execute(OP_CODE["SED"])
-
-		if !cpu.statusRegister.decimalModeFlag {
-			t.Errorf("Decimal mode flag should be set")
-		}
-	})
-
-	t.Run("Set the break status flag", func(t *testing.T) {
-		cpu := NewCPU()
-
-		cpu.execute(OP_CODE["BRK"])
-
-		if !cpu.statusRegister.breakCommandFlag {
-			t.Errorf("Break status flag should be set")
-		}
+			if !cpu.statusRegister.breakCommandFlag {
+				t.Errorf("Break status flag should be set")
+			}
+		})
 	})
 }
 
