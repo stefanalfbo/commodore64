@@ -1,5 +1,7 @@
 package cpu6510
 
+import "fmt"
+
 const memorySize = 65536
 
 type StatusRegister struct {
@@ -15,6 +17,9 @@ type StatusRegister struct {
 	// Indicates that interrupt request has been triggered by an BRK
 	// opcode (not an IRQ).
 	breakCommandFlag bool
+	// Indicates that a result of an signed arithmetic operation
+	// exceeds the signed value range (-128 to 127).
+	overflowFlag bool
 }
 
 // The CPU struct represents the CPU6510 processor.
@@ -43,6 +48,7 @@ func NewCPU() *CPU {
 			interruptDisableFlag: false,
 			decimalModeFlag:      false,
 			breakCommandFlag:     false,
+			overflowFlag:         false,
 		},
 	}
 }
@@ -59,7 +65,7 @@ func (c *CPU) execute(instruction byte) {
 	if runOpCode, ok := lookupOpCode[instruction]; ok {
 		runOpCode(c)
 	} else {
-		panic("Unknown instruction")
+		panic(fmt.Sprintf("Unknown instruction, %x", instruction))
 	}
 }
 

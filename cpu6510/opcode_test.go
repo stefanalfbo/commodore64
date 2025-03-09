@@ -8,7 +8,7 @@ func TestBRK(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 2
 
-	cpu.execute(OP_CODE["BRK"])
+	cpu.execute(OpCodeAsHex("BRK"))
 
 	if !cpu.statusRegister.interruptDisableFlag {
 		t.Errorf("Interrupt disable flag should be set")
@@ -28,7 +28,7 @@ func TestCLC(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.carry = true
 
-	cpu.execute(OP_CODE["CLC"])
+	cpu.execute(OpCodeAsHex("CLC"))
 
 	if cpu.statusRegister.carry {
 		t.Errorf("Carry flag should be cleared")
@@ -43,7 +43,7 @@ func TestSEC(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OP_CODE["SEC"])
+	cpu.execute(OpCodeAsHex("SEC"))
 
 	if !cpu.statusRegister.carry {
 		t.Errorf("Carry flag should be set")
@@ -59,10 +59,26 @@ func TestCLI(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.interruptDisableFlag = true
 
-	cpu.execute(OP_CODE["CLI"])
+	cpu.execute(OpCodeAsHex("CLI"))
 
 	if cpu.statusRegister.interruptDisableFlag {
 		t.Errorf("Interrupt disable flag should be cleared")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
+func TestCLV(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+	cpu.statusRegister.overflowFlag = true
+
+	cpu.execute(OpCodeAsHex("CLV"))
+
+	if cpu.statusRegister.overflowFlag {
+		t.Errorf("Overflow flag should be cleared")
 	}
 
 	if cpu.programCounter != expectedPC {
@@ -75,7 +91,7 @@ func TestCLD(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.decimalModeFlag = true
 
-	cpu.execute(OP_CODE["CLD"])
+	cpu.execute(OpCodeAsHex("CLD"))
 
 	if cpu.statusRegister.decimalModeFlag {
 		t.Errorf("Decimal mode flag should be cleared")
@@ -90,7 +106,7 @@ func TestSED(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OP_CODE["SED"])
+	cpu.execute(OpCodeAsHex("SED"))
 
 	if !cpu.statusRegister.decimalModeFlag {
 		t.Errorf("Decimal mode flag should be set")

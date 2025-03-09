@@ -1,5 +1,7 @@
 package cpu6510
 
+import "fmt"
+
 type OpCodeFunc func(*CPU)
 
 var lookupOpCode = map[byte]OpCodeFunc{
@@ -7,15 +9,26 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x18: CLC,
 	0x38: SEC,
 	0x58: CLI,
+	0xB8: CLV,
 	0xD8: CLD,
 	0xF8: SED,
 }
 
-var OP_CODE = map[string]byte{
+func OpCodeAsHex(name string) byte {
+	opCode, ok := opCodes[name]
+	if !ok {
+		panic(fmt.Sprintf("Unknown op code, %s", name))
+	}
+
+	return opCode
+}
+
+var opCodes = map[string]byte{
 	"BRK": 0x00,
 	"CLC": 0x18,
 	"SEC": 0x38,
 	"CLI": 0x58,
+	"CLV": 0xB8,
 	"CLD": 0xD8,
 	"SED": 0xF8,
 }
@@ -46,6 +59,12 @@ func SEC(c *CPU) {
 // CLI - CLear Interrupt disable flag
 func CLI(c *CPU) {
 	c.statusRegister.interruptDisableFlag = false
+	c.programCounter++
+}
+
+// CLV - CLear oVerflow flag
+func CLV(c *CPU) {
+	c.statusRegister.overflowFlag = false
 	c.programCounter++
 }
 
