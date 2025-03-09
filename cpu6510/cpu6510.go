@@ -45,9 +45,6 @@ func NewCPU() *CPU {
 func (c *CPU) next() byte {
 	instruction := c.ram[c.programCounter]
 
-	// Should the program counter be incremented here? See the BRK opcode.
-	c.programCounter++
-
 	return instruction
 }
 
@@ -58,9 +55,14 @@ func (c *CPU) execute(instruction byte) {
 		c.BRK()
 	case 0x18:
 		c.CLC()
+	case 0x38:
+		c.SEC()
 	default:
 		panic("Unknown instruction")
 	}
+
+	// Should the program counter be incremented here? See the BRK opcode.
+	c.programCounter++
 }
 
 // Run the CPU.

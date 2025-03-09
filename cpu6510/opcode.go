@@ -1,6 +1,12 @@
 package cpu6510
 
-// BRK - BReaKpoint, 0x00. BRK is intended for use as a debugging tool which
+var OP_CODE = map[string]byte{
+	"BRK": 0x00,
+	"CLC": 0x18,
+	"SEC": 0x38,
+}
+
+// BRK - BReaKpoint. BRK is intended for use as a debugging tool which
 // a programmer may place at specific points in a program, to check the state
 // of processor flags at these points in the code.
 func (c *CPU) BRK() {
@@ -13,12 +19,12 @@ func (c *CPU) BRK() {
 
 }
 
-// CLC - CLear Carry, 0x18
+// CLC - CLear Carry
 func (c *CPU) CLC() {
 	c.statusRegister.carry = false
 }
 
-// SEC - SEt Carry, 0x38
+// SEC - SEt Carry
 func (c *CPU) SEC() {
 	c.statusRegister.carry = true
 }
