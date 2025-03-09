@@ -1,5 +1,16 @@
 package cpu6510
 
+type OpCodeFunc func(*CPU)
+
+var lookupOpCode = map[byte]OpCodeFunc{
+	0x00: BRK,
+	0x18: CLC,
+	0x38: SEC,
+	0x58: CLI,
+	0xD8: CLD,
+	0xF8: SED,
+}
+
 var OP_CODE = map[string]byte{
 	"BRK": 0x00,
 	"CLC": 0x18,
@@ -12,37 +23,40 @@ var OP_CODE = map[string]byte{
 // BRK - BReaKpoint. BRK is intended for use as a debugging tool which
 // a programmer may place at specific points in a program, to check the state
 // of processor flags at these points in the code.
-func (c *CPU) BRK() {
+func BRK(c *CPU) {
 	c.statusRegister.breakCommandFlag = true
 	c.statusRegister.interruptDisableFlag = true
 
-	// BRK increments the program counter by 2 instead of 1, therefore we
-	// increment it one more time here.
-	c.programCounter++
-
+	// BRK increments the program counter by 2 instead of 1
+	c.programCounter += 2
 }
 
 // CLC - CLear Carry
-func (c *CPU) CLC() {
+func CLC(c *CPU) {
 	c.statusRegister.carry = false
+	c.programCounter++
 }
 
 // SEC - SEt Carry
-func (c *CPU) SEC() {
+func SEC(c *CPU) {
 	c.statusRegister.carry = true
+	c.programCounter++
 }
 
 // CLI - CLear Interrupt disable flag
-func (c *CPU) CLI() {
+func CLI(c *CPU) {
 	c.statusRegister.interruptDisableFlag = false
+	c.programCounter++
 }
 
 // CLD - CLear Decimal flag
-func (c *CPU) CLD() {
+func CLD(c *CPU) {
 	c.statusRegister.decimalModeFlag = false
+	c.programCounter++
 }
 
 // SED - SEt Decimal flag
-func (c *CPU) SED() {
+func SED(c *CPU) {
 	c.statusRegister.decimalModeFlag = true
+	c.programCounter++
 }

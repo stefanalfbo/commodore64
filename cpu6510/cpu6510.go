@@ -56,25 +56,11 @@ func (c *CPU) next() byte {
 
 // Execute executes the instruction.
 func (c *CPU) execute(instruction byte) {
-	switch instruction {
-	case 0x00:
-		c.BRK()
-	case 0x18:
-		c.CLC()
-	case 0x38:
-		c.SEC()
-	case 0x58:
-		c.CLI()
-	case 0xD8:
-		c.CLD()
-	case 0xF8:
-		c.SED()
-	default:
+	if runOpCode, ok := lookupOpCode[instruction]; ok {
+		runOpCode(c)
+	} else {
 		panic("Unknown instruction")
 	}
-
-	// Should the program counter be incremented here? See the BRK opcode.
-	c.programCounter++
 }
 
 // Run the CPU.

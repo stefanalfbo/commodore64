@@ -54,6 +54,22 @@ func TestSEC(t *testing.T) {
 	}
 }
 
+func TestCLI(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+	cpu.statusRegister.interruptDisableFlag = true
+
+	cpu.execute(OP_CODE["CLI"])
+
+	if cpu.statusRegister.interruptDisableFlag {
+		t.Errorf("Interrupt disable flag should be cleared")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
 func TestCLD(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
