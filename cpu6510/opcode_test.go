@@ -4,36 +4,27 @@ import (
 	"testing"
 )
 
-func TestStatusRegister(t *testing.T) {
+func TestBRK(t *testing.T) {
+	cpu := NewCPU()
 
-	t.Run("Clear the carry flag", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.statusRegister.carry = true
+	cpu.BRK()
 
-		cpu.CLC()
+	if !cpu.statusRegister.interruptDisableFlag {
+		t.Errorf("Interrupt disable flag should be set")
+	}
 
-		if cpu.statusRegister.carry {
-			t.Errorf("Carry flag should be cleared")
-		}
-	})
+	if !cpu.statusRegister.breakCommandFlag {
+		t.Errorf("Break status flag should be set")
+	}
+}
 
-	t.Run("Set the interrupt disable flag", func(t *testing.T) {
-		cpu := NewCPU()
+func TestCLC(t *testing.T) {
+	cpu := NewCPU()
+	cpu.statusRegister.carry = true
 
-		cpu.BRK()
+	cpu.CLC()
 
-		if !cpu.statusRegister.interruptDisableFlag {
-			t.Errorf("Interrupt disable flag should be set")
-		}
-	})
-
-	t.Run("Set the break status flag", func(t *testing.T) {
-		cpu := NewCPU()
-
-		cpu.BRK()
-
-		if !cpu.statusRegister.breakCommandFlag {
-			t.Errorf("Break status flag should be set")
-		}
-	})
+	if cpu.statusRegister.carry {
+		t.Errorf("Carry flag should be cleared")
+	}
 }
