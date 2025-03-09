@@ -17,3 +17,8 @@ func (c *CPU) BRK() {
 func (c *CPU) CLC() {
 	c.statusRegister.carry = false
 }
+
+// SEC - SEt Carry, 0x38
+func (c *CPU) SEC() {
+	c.statusRegister.carry = true
+}

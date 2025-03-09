@@ -33,6 +33,16 @@ func TestStatusRegister(t *testing.T) {
 		}
 	})
 
+	t.Run("Set the carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+
+		cpu.SEC()
+
+		if !cpu.statusRegister.carry {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
 	t.Run("Set the interrupt disable flag", func(t *testing.T) {
 		cpu := NewCPU()
 

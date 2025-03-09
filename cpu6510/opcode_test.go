@@ -28,3 +28,13 @@ func TestCLC(t *testing.T) {
 		t.Errorf("Carry flag should be cleared")
 	}
 }
+
+func TestSEC(t *testing.T) {
+	cpu := NewCPU()
+
+	cpu.SEC()
+
+	if !cpu.statusRegister.carry {
+		t.Errorf("Carry flag should be set")
+	}
+}
