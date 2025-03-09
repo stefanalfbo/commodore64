@@ -6,6 +6,12 @@ type StatusRegister struct {
 	// Indicates when a bit of the result is to be carried to or borrowed
 	// from another byte. Also used for rotate and shift operations.
 	carry bool
+	// If set IRQ will be prevented (masked), except non-maskable
+	// interrupts (NMI).
+	interruptDisableFlag bool
+	// Indicates that interrupt request has been triggered by an BRK
+	// opcode (not an IRQ).
+	breakCommandFlag bool
 }
 
 // The CPU struct represents the CPU6510 processor.
@@ -36,10 +42,36 @@ func NewCPU() *CPU {
 }
 
 // Next fetches the next instruction from memory.
-func (c *CPU) Next() byte {
+func (c *CPU) next() byte {
 	instruction := c.ram[c.programCounter]
 
+	// Should the program counter be incremented here? See the BRK opcode.
 	c.programCounter++
 
 	return instruction
+}
+
+// Execute executes the instruction.
+func (c *CPU) execute(instruction byte) {
+	switch instruction {
+	case 0x00:
+		c.BRK()
+	case 0x18:
+		c.CLC()
+	default:
+		panic("Unknown instruction")
+	}
+}
+
+// Run the CPU.
+func (c *CPU) Run() {
+	for {
+		instruction := c.next()
+		c.execute(instruction)
+
+		// Exit the loop when the instruction is BRK, 0x00.
+		if instruction == 0x00 {
+			break
+		}
+	}
 }

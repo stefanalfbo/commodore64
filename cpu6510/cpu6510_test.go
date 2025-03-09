@@ -19,3 +19,16 @@ func TestNewCPU(t *testing.T) {
 		}
 	}
 }
+
+func TestRunCpu(t *testing.T) {
+	cpu := NewCPU()
+
+	cpu.ram[0] = 0x18
+	cpu.ram[1] = 0x00
+
+	cpu.Run()
+
+	if cpu.statusRegister.carry {
+		t.Errorf("Carry flag should be cleared")
+	}
+}
