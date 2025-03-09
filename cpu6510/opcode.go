@@ -4,6 +4,8 @@ var OP_CODE = map[string]byte{
 	"BRK": 0x00,
 	"CLC": 0x18,
 	"SEC": 0x38,
+	"CLD": 0xD8,
+	"SED": 0xF8,
 }
 
 // BRK - BReaKpoint. BRK is intended for use as a debugging tool which
@@ -27,4 +29,14 @@ func (c *CPU) CLC() {
 // SEC - SEt Carry
 func (c *CPU) SEC() {
 	c.statusRegister.carry = true
+}
+
+// CLD - CLear Decimal flag
+func (c *CPU) CLD() {
+	c.statusRegister.decimalModeFlag = false
+}
+
+// SED - SEt Decimal flag
+func (c *CPU) SED() {
+	c.statusRegister.decimalModeFlag = true
 }

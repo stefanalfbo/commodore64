@@ -53,3 +53,34 @@ func TestSEC(t *testing.T) {
 		t.Errorf("Program counter should be incremented")
 	}
 }
+
+func TestCLD(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+	cpu.statusRegister.decimalModeFlag = true
+
+	cpu.execute(OP_CODE["CLD"])
+
+	if cpu.statusRegister.decimalModeFlag {
+		t.Errorf("Decimal mode flag should be cleared")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
+func TestSED(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+
+	cpu.execute(OP_CODE["SED"])
+
+	if !cpu.statusRegister.decimalModeFlag {
+		t.Errorf("Decimal mode flag should be set")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}

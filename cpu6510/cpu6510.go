@@ -9,6 +9,9 @@ type StatusRegister struct {
 	// If set IRQ will be prevented (masked), except non-maskable
 	// interrupts (NMI).
 	interruptDisableFlag bool
+	// If set arithmetic operations are calculated in decimal mode
+	// (otherwise usually in binary mode).
+	decimalModeFlag bool
 	// Indicates that interrupt request has been triggered by an BRK
 	// opcode (not an IRQ).
 	breakCommandFlag bool
@@ -36,7 +39,10 @@ func NewCPU() *CPU {
 	return &CPU{
 		programCounter: 0,
 		statusRegister: StatusRegister{
-			carry: false,
+			carry:                false,
+			interruptDisableFlag: false,
+			decimalModeFlag:      false,
+			breakCommandFlag:     false,
 		},
 	}
 }
@@ -57,6 +63,10 @@ func (c *CPU) execute(instruction byte) {
 		c.CLC()
 	case 0x38:
 		c.SEC()
+	case 0xD8:
+		c.CLD()
+	case 0xF8:
+		c.SED()
 	default:
 		panic("Unknown instruction")
 	}

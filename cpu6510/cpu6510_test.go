@@ -13,6 +13,14 @@ func TestNewCPU(t *testing.T) {
 		t.Errorf("Carry flag should be initialized to false")
 	}
 
+	if cpu.statusRegister.interruptDisableFlag {
+		t.Errorf("Interrupt disable flag should be initialized to false")
+	}
+
+	if cpu.statusRegister.decimalModeFlag {
+		t.Errorf("Decimal mode flag should be initialized to false")
+	}
+
 	for i := 0; i < memorySize; i++ {
 		if cpu.ram[i] != 0 {
 			t.Errorf("RAM should be initialized to 0")
@@ -50,6 +58,27 @@ func TestStatusRegister(t *testing.T) {
 
 		if !cpu.statusRegister.interruptDisableFlag {
 			t.Errorf("Interrupt disable flag should be set")
+		}
+	})
+
+	t.Run("Clear the decimal mode flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.decimalModeFlag = true
+
+		cpu.execute(OP_CODE["CLD"])
+
+		if cpu.statusRegister.decimalModeFlag {
+			t.Errorf("Decimal mode flag should be cleared")
+		}
+	})
+
+	t.Run("Set the decimal mode flag", func(t *testing.T) {
+		cpu := NewCPU()
+
+		cpu.execute(OP_CODE["SED"])
+
+		if !cpu.statusRegister.decimalModeFlag {
+			t.Errorf("Decimal mode flag should be set")
 		}
 	})
 
