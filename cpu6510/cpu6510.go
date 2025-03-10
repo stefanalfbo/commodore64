@@ -45,6 +45,12 @@ type CPU struct {
 	// The X index register is an 8-Bit data register. The register is used
 	// in the Indexed Indirect, and Absolute indexed by X addressing modes.
 	xRegister byte
+	// The Y index register is an 8-Bit data register. The register is used
+	// in the Indirect Indexed, and Absolute indexed by Y addressing modes.
+	// Also used in conjuction with the Accumulator (A) to form either memory
+	// address locations (A/Y) or 16-Bit signed values (A/Y) for Floating
+	// point arithmetic.
+	yRegister byte
 }
 
 // NewCPU creates a new CPU6510 processor.
@@ -61,6 +67,7 @@ func NewCPU() *CPU {
 			negativeFlag:         false,
 		},
 		xRegister: 0,
+		yRegister: 0,
 	}
 }
 

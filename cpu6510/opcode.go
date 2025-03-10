@@ -9,6 +9,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x18: CLC,
 	0x38: SEC,
 	0x58: CLI,
+	0x88: DEY,
 	0xB8: CLV,
 	0xCA: DEX,
 	0xD8: CLD,
@@ -31,6 +32,7 @@ var opCodes = map[string]byte{
 	"CLC": 0x18,
 	"SEC": 0x38,
 	"CLI": 0x58,
+	"DEY": 0x88,
 	"CLV": 0xB8,
 	"DEX": 0xCA,
 	"CLD": 0xD8,
@@ -65,6 +67,25 @@ func SEC(c *CPU) {
 // CLI - CLear Interrupt disable flag
 func CLI(c *CPU) {
 	c.statusRegister.interruptDisableFlag = false
+	c.programCounter++
+}
+
+// DEY - DEcrement Y register. decreases the numerical value held in the Y
+// index register by one, and "wraps over" when the numerical limits of a
+// byte are exceeded.
+func DEY(c *CPU) {
+	y := uint8(c.yRegister)
+	y--
+	c.yRegister = y
+
+	if c.yRegister == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.yRegister&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
 	c.programCounter++
 }
 
