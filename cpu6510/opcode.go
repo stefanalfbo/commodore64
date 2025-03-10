@@ -10,6 +10,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x38: SEC,
 	0x58: CLI,
 	0xB8: CLV,
+	0xCA: DEX,
 	0xD8: CLD,
 	0xEA: NOP,
 	0xE8: INX,
@@ -31,6 +32,7 @@ var opCodes = map[string]byte{
 	"SEC": 0x38,
 	"CLI": 0x58,
 	"CLV": 0xB8,
+	"DEX": 0xCA,
 	"CLD": 0xD8,
 	"NOP": 0xEA,
 	"INX": 0xE8,
@@ -69,6 +71,25 @@ func CLI(c *CPU) {
 // CLV - CLear oVerflow flag
 func CLV(c *CPU) {
 	c.statusRegister.overflowFlag = false
+	c.programCounter++
+}
+
+// DEX - DEcrement X register. decreases the numerical value held in the X
+// index register by one, and "wraps over" when the numerical limits of a
+// byte are exceeded.
+func DEX(c *CPU) {
+	x := uint8(c.xRegister)
+	x--
+	c.xRegister = x
+
+	if c.xRegister == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.xRegister&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
 	c.programCounter++
 }
 
