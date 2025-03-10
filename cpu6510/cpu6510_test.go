@@ -9,7 +9,7 @@ func TestNewCPU(t *testing.T) {
 		t.Errorf("Program counter should be initialized to 0")
 	}
 
-	if cpu.statusRegister.carry {
+	if cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be initialized to false")
 	}
 
@@ -36,18 +36,18 @@ func TestStatusRegister(t *testing.T) {
 
 			cpu.execute(OpCodeAsHex("SEC"))
 
-			if !cpu.statusRegister.carry {
+			if !cpu.statusRegister.carryFlag {
 				t.Errorf("Carry flag should be set")
 			}
 		})
 
 		t.Run("Clear the carry flag", func(t *testing.T) {
 			cpu := NewCPU()
-			cpu.statusRegister.carry = true
+			cpu.statusRegister.carryFlag = true
 
 			cpu.execute(OpCodeAsHex("CLC"))
 
-			if cpu.statusRegister.carry {
+			if cpu.statusRegister.carryFlag {
 				t.Errorf("Carry flag should be cleared")
 			}
 		})
@@ -133,7 +133,7 @@ func TestRunCpu(t *testing.T) {
 
 	cpu.Run()
 
-	if cpu.statusRegister.carry {
+	if cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be cleared")
 	}
 }

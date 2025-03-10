@@ -26,11 +26,11 @@ func TestBRK(t *testing.T) {
 func TestCLC(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
-	cpu.statusRegister.carry = true
+	cpu.statusRegister.carryFlag = true
 
 	cpu.execute(OpCodeAsHex("CLC"))
 
-	if cpu.statusRegister.carry {
+	if cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be cleared")
 	}
 
@@ -45,7 +45,7 @@ func TestSEC(t *testing.T) {
 
 	cpu.execute(OpCodeAsHex("SEC"))
 
-	if !cpu.statusRegister.carry {
+	if !cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be set")
 	}
 
@@ -115,4 +115,65 @@ func TestSED(t *testing.T) {
 	if cpu.programCounter != expectedPC {
 		t.Errorf("Program counter should be incremented")
 	}
+}
+
+func TestRegisterInstructionsImpliedMode(t *testing.T) {
+	t.Run("INX - Increment X register", func(t *testing.T) {
+		t.Run("Increment X register", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.xRegister = 0x01
+
+			cpu.execute(OpCodeAsHex("INX"))
+
+			if cpu.xRegister != 0x02 {
+				t.Errorf("X register should be incremented")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Increment X register and set zero flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.xRegister = 0xFF
+
+			cpu.execute(OpCodeAsHex("INX"))
+
+			if cpu.xRegister != 0x00 {
+				t.Errorf("X register should be incremented")
+			}
+
+			if !cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be set")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Increment X register and set negative flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.xRegister = 0x7F
+
+			cpu.execute(OpCodeAsHex("INX"))
+
+			if cpu.xRegister != 0x80 {
+				t.Errorf("X register should be incremented")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if !cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be set")
+			}
+		})
+	})
 }

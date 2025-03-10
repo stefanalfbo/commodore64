@@ -7,19 +7,24 @@ const memorySize = 65536
 type StatusRegister struct {
 	// Indicates when a bit of the result is to be carried to or borrowed
 	// from another byte. Also used for rotate and shift operations.
-	carry bool
+	carryFlag bool // C
+	// True indicates that the result of an operation is equal to zero.
+	zeroFlag bool // Z
 	// If set IRQ will be prevented (masked), except non-maskable
 	// interrupts (NMI).
-	interruptDisableFlag bool
+	interruptDisableFlag bool // I
 	// If set arithmetic operations are calculated in decimal mode
 	// (otherwise usually in binary mode).
-	decimalModeFlag bool
+	decimalModeFlag bool // D
 	// Indicates that interrupt request has been triggered by an BRK
 	// opcode (not an IRQ).
-	breakCommandFlag bool
+	breakCommandFlag bool // B
 	// Indicates that a result of an signed arithmetic operation
 	// exceeds the signed value range (-128 to 127).
-	overflowFlag bool
+	overflowFlag bool // V
+	// A value of true indicates that the result is negative (bit 7 is
+	// set, for a two's complement representation).
+	negativeFlag bool // N
 }
 
 // The CPU struct represents the CPU6510 processor.
@@ -37,6 +42,9 @@ type CPU struct {
 	// The Random Access Memory (RAM) is a 64KB (65536 Bytes) memory that
 	// stores the program and data that the CPU6510 will execute.
 	ram [memorySize]byte
+	// The X index register is an 8-Bit data register. The register is used
+	// in the Indexed Indirect, and Absolute indexed by X addressing modes.
+	xRegister byte
 }
 
 // NewCPU creates a new CPU6510 processor.
@@ -44,12 +52,15 @@ func NewCPU() *CPU {
 	return &CPU{
 		programCounter: 0,
 		statusRegister: StatusRegister{
-			carry:                false,
+			carryFlag:            false,
+			zeroFlag:             false,
 			interruptDisableFlag: false,
 			decimalModeFlag:      false,
 			breakCommandFlag:     false,
 			overflowFlag:         false,
+			negativeFlag:         false,
 		},
+		xRegister: 0,
 	}
 }
 

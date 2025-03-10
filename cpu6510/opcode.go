@@ -11,6 +11,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x58: CLI,
 	0xB8: CLV,
 	0xD8: CLD,
+	0xE8: INX,
 	0xF8: SED,
 }
 
@@ -30,6 +31,7 @@ var opCodes = map[string]byte{
 	"CLI": 0x58,
 	"CLV": 0xB8,
 	"CLD": 0xD8,
+	"INX": 0xE8,
 	"SED": 0xF8,
 }
 
@@ -46,13 +48,13 @@ func BRK(c *CPU) {
 
 // CLC - CLear Carry
 func CLC(c *CPU) {
-	c.statusRegister.carry = false
+	c.statusRegister.carryFlag = false
 	c.programCounter++
 }
 
 // SEC - SEt Carry
 func SEC(c *CPU) {
-	c.statusRegister.carry = true
+	c.statusRegister.carryFlag = true
 	c.programCounter++
 }
 
@@ -71,6 +73,25 @@ func CLV(c *CPU) {
 // CLD - CLear Decimal flag
 func CLD(c *CPU) {
 	c.statusRegister.decimalModeFlag = false
+	c.programCounter++
+}
+
+// INX - INcrement X register. increases the numerical value held in the X
+// index register by one, and "wraps over" when the numerical limits of a
+// byte are exceeded.
+func INX(c *CPU) {
+	x := uint8(c.xRegister)
+	x++
+	c.xRegister = x
+
+	if c.xRegister == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.xRegister&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
 	c.programCounter++
 }
 
