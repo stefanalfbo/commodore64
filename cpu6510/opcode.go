@@ -11,6 +11,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x58: CLI,
 	0xB8: CLV,
 	0xD8: CLD,
+	0xEA: NOP,
 	0xE8: INX,
 	0xF8: SED,
 }
@@ -31,6 +32,7 @@ var opCodes = map[string]byte{
 	"CLI": 0x58,
 	"CLV": 0xB8,
 	"CLD": 0xD8,
+	"NOP": 0xEA,
 	"INX": 0xE8,
 	"SED": 0xF8,
 }
@@ -73,6 +75,11 @@ func CLV(c *CPU) {
 // CLD - CLear Decimal flag
 func CLD(c *CPU) {
 	c.statusRegister.decimalModeFlag = false
+	c.programCounter++
+}
+
+// NOP - No OPeration.
+func NOP(c *CPU) {
 	c.programCounter++
 }
 

@@ -86,6 +86,17 @@ func TestCLV(t *testing.T) {
 	}
 }
 
+func TestNOP(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+
+	cpu.execute(OpCodeAsHex("NOP"))
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
 func TestCLD(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
