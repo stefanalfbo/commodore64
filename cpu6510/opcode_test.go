@@ -188,6 +188,65 @@ func TestRegisterInstructionsImpliedMode(t *testing.T) {
 		})
 	})
 
+	t.Run("TAX - Transfer A to X", func(t *testing.T) {
+		t.Run("Transfer A to X", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.accumulator = 0x03
+
+			cpu.execute(OpCodeAsHex("TAX"))
+
+			if cpu.xRegister != 0x03 {
+				t.Errorf("X register should be set to the value of the accumulator")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Transfer A to X and set zero flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.accumulator = 0x00
+
+			cpu.execute(OpCodeAsHex("TAX"))
+
+			if cpu.xRegister != 0x00 {
+				t.Errorf("X register should be set to the value of the accumulator")
+			}
+
+			if !cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be set")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Transfer A to X and set negative flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.accumulator = 0x80
+
+			cpu.execute(OpCodeAsHex("TAX"))
+
+			if cpu.xRegister != 0x80 {
+				t.Errorf("X register should be set to the value of the accumulator")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if !cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be set")
+			}
+		})
+	})
+
 	t.Run("INY - Increment Y register", func(t *testing.T) {
 		t.Run("Increment Y register", func(t *testing.T) {
 			cpu := NewCPU()

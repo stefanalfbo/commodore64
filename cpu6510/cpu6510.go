@@ -51,6 +51,10 @@ type CPU struct {
 	// address locations (A/Y) or 16-Bit signed values (A/Y) for Floating
 	// point arithmetic.
 	yRegister byte
+	// The accumulator (abbreviated as A) is a 8-bit data register.The
+	// accumulator primarily serves as register for arithmetic and logical
+	// operations.
+	accumulator byte
 }
 
 // NewCPU creates a new CPU6510 processor.
@@ -66,8 +70,9 @@ func NewCPU() *CPU {
 			overflowFlag:         false,
 			negativeFlag:         false,
 		},
-		xRegister: 0,
-		yRegister: 0,
+		xRegister:   0,
+		yRegister:   0,
+		accumulator: 0,
 	}
 }
 

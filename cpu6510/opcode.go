@@ -10,6 +10,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x38: SEC,
 	0x58: CLI,
 	0x88: DEY,
+	0xAA: TAX,
 	0xB8: CLV,
 	0xC8: INY,
 	0xCA: DEX,
@@ -34,6 +35,7 @@ var opCodes = map[string]byte{
 	"SEC": 0x38,
 	"CLI": 0x58,
 	"DEY": 0x88,
+	"TAX": 0xAA,
 	"CLV": 0xB8,
 	"INY": 0xC8,
 	"DEX": 0xCA,
@@ -85,6 +87,22 @@ func DEY(c *CPU) {
 	}
 
 	if c.yRegister&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
+	c.programCounter++
+}
+
+// TAX - Transfer A to X. copies the current value in the accumulator to the
+// X index register.
+func TAX(c *CPU) {
+	c.xRegister = c.accumulator
+
+	if c.xRegister == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.xRegister&0x80 == 0x80 {
 		c.statusRegister.negativeFlag = true
 	}
 
