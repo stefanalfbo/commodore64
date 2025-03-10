@@ -188,6 +188,65 @@ func TestRegisterInstructionsImpliedMode(t *testing.T) {
 		})
 	})
 
+	t.Run("INY - Increment Y register", func(t *testing.T) {
+		t.Run("Increment Y register", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.yRegister = 0x01
+
+			cpu.execute(OpCodeAsHex("INY"))
+
+			if cpu.yRegister != 0x02 {
+				t.Errorf("X register should be incremented")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Increment Y register and set zero flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.yRegister = 0xFF
+
+			cpu.execute(OpCodeAsHex("INY"))
+
+			if cpu.yRegister != 0x00 {
+				t.Errorf("Y register should be incremented")
+			}
+
+			if !cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be set")
+			}
+
+			if cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be cleared")
+			}
+		})
+
+		t.Run("Increment Y register and set negative flag", func(t *testing.T) {
+			cpu := NewCPU()
+			cpu.yRegister = 0x7F
+
+			cpu.execute(OpCodeAsHex("INY"))
+
+			if cpu.yRegister != 0x80 {
+				t.Errorf("Y register should be incremented")
+			}
+
+			if cpu.statusRegister.zeroFlag {
+				t.Errorf("Zero flag should be cleared")
+			}
+
+			if !cpu.statusRegister.negativeFlag {
+				t.Errorf("Negative flag should be set")
+			}
+		})
+	})
+
 	t.Run("DEX - Decrement X register", func(t *testing.T) {
 		t.Run("Decrement X register", func(t *testing.T) {
 			cpu := NewCPU()

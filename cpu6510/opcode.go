@@ -11,6 +11,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x58: CLI,
 	0x88: DEY,
 	0xB8: CLV,
+	0xC8: INY,
 	0xCA: DEX,
 	0xD8: CLD,
 	0xEA: NOP,
@@ -34,6 +35,7 @@ var opCodes = map[string]byte{
 	"CLI": 0x58,
 	"DEY": 0x88,
 	"CLV": 0xB8,
+	"INY": 0xC8,
 	"DEX": 0xCA,
 	"CLD": 0xD8,
 	"NOP": 0xEA,
@@ -92,6 +94,25 @@ func DEY(c *CPU) {
 // CLV - CLear oVerflow flag
 func CLV(c *CPU) {
 	c.statusRegister.overflowFlag = false
+	c.programCounter++
+}
+
+// INY - INcrement Y register. increases the numerical value held in the Y
+// index register by one, and "wraps over" when the numerical limits of a
+// byte are exceeded.
+func INY(c *CPU) {
+	y := uint8(c.yRegister)
+	y++
+	c.yRegister = y
+
+	if c.yRegister == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.yRegister&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
 	c.programCounter++
 }
 
