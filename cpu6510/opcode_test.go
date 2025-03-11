@@ -54,6 +54,26 @@ func TestSEC(t *testing.T) {
 	}
 }
 
+func TestPHA(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+	cpu.accumulator = 0x03
+
+	cpu.execute(OpCodeAsHex("PHA"))
+
+	if cpu.ram[0x01FF] != cpu.accumulator {
+		t.Errorf("Accumulator should be pushed onto the stack")
+	}
+
+	if cpu.stackPointer != 0xFE {
+		t.Errorf("Stack pointer should be decremented")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
 func TestCLI(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1

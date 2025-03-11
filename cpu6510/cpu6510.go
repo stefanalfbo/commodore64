@@ -3,6 +3,7 @@ package cpu6510
 import "fmt"
 
 const memorySize = 65536
+const stackBase uint16 = 0x0100
 
 type StatusRegister struct {
 	// Indicates when a bit of the result is to be carried to or borrowed
@@ -55,6 +56,12 @@ type CPU struct {
 	// accumulator primarily serves as register for arithmetic and logical
 	// operations.
 	accumulator byte
+	// The Stack Pointer is a 8-bit register. The stack pointer always points
+	// to the next available location on the stack.
+	//
+	// The first entry in the stack is $01FF and the last entry is $0100. When
+	// the stack is empty SP = $FF.
+	stackPointer byte
 }
 
 // NewCPU creates a new CPU6510 processor.
@@ -70,9 +77,10 @@ func NewCPU() *CPU {
 			overflowFlag:         false,
 			negativeFlag:         false,
 		},
-		xRegister:   0,
-		yRegister:   0,
-		accumulator: 0,
+		xRegister:    0,
+		yRegister:    0,
+		accumulator:  0,
+		stackPointer: 0xFF,
 	}
 }
 

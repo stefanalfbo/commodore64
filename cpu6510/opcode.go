@@ -8,6 +8,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
 	0x18: CLC,
 	0x38: SEC,
+	0x48: PHA,
 	0x58: CLI,
 	0x88: DEY,
 	0x8A: TXA,
@@ -36,6 +37,7 @@ var opCodes = map[string]byte{
 	"BRK": 0x00,
 	"CLC": 0x18,
 	"SEC": 0x38,
+	"PHA": 0x48,
 	"CLI": 0x58,
 	"DEY": 0x88,
 	"TXA": 0x8A,
@@ -71,6 +73,14 @@ func CLC(c *CPU) {
 // SEC - SEt Carry
 func SEC(c *CPU) {
 	c.statusRegister.carryFlag = true
+	c.programCounter++
+}
+
+// PHA - PusH Accumulator. pushes the current value in the accumulator onto
+// the stack.
+func PHA(c *CPU) {
+	c.ram[stackBase+uint16(c.stackPointer)] = c.accumulator
+	c.stackPointer--
 	c.programCounter++
 }
 
