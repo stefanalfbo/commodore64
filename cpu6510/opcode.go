@@ -81,8 +81,7 @@ func SEC(c *CPU) {
 // PHA - PusH Accumulator. pushes the current value in the accumulator onto
 // the stack.
 func PHA(c *CPU) {
-	c.ram[stackBase+uint16(c.stackPointer)] = c.accumulator
-	c.stackPointer--
+	c.pushOnStack(c.accumulator)
 	c.programCounter++
 }
 
@@ -95,8 +94,7 @@ func CLI(c *CPU) {
 // PLA - PuLl Accumulator. pulls the current value from the stack and places
 // it in the accumulator.
 func PLA(c *CPU) {
-	c.stackPointer++
-	c.accumulator = c.ram[stackBase+uint16(c.stackPointer)]
+	c.accumulator = c.popFromStack()
 
 	if c.accumulator == 0 {
 		c.statusRegister.zeroFlag = true

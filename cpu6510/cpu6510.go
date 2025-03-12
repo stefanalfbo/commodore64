@@ -2,7 +2,10 @@ package cpu6510
 
 import "fmt"
 
+// The memory size of the CPU6510 is 64KB (65536 Bytes).
 const memorySize = 65536
+
+// The stack is located in the memory range $0100-$01FF.
 const stackBase uint16 = 0x0100
 
 type StatusRegister struct {
@@ -82,6 +85,16 @@ func NewCPU() *CPU {
 		accumulator:  0,
 		stackPointer: 0xFF,
 	}
+}
+
+func (c *CPU) pushOnStack(value byte) {
+	c.ram[stackBase+uint16(c.stackPointer)] = value
+	c.stackPointer--
+}
+
+func (c *CPU) popFromStack() byte {
+	c.stackPointer++
+	return c.ram[stackBase+uint16(c.stackPointer)]
 }
 
 // Next fetches the next instruction from memory.
