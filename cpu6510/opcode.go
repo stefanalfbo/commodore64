@@ -11,6 +11,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x48: PHA,
 	0x58: CLI,
 	0x68: PLA,
+	0x78: SEI,
 	0x88: DEY,
 	0x8A: TXA,
 	0x98: TYA,
@@ -41,6 +42,7 @@ var opCodes = map[string]byte{
 	"PHA": 0x48,
 	"CLI": 0x58,
 	"PLA": 0x68,
+	"SEI": 0x78,
 	"DEY": 0x88,
 	"TXA": 0x8A,
 	"TYA": 0x98,
@@ -108,6 +110,13 @@ func PLA(c *CPU) {
 
 	raiseStatusRegisterFlags(c, c.accumulator)
 
+	c.programCounter++
+}
+
+// SEI - SEt Interrupt disable flag, preventing the CPU from responding to
+// IRQ interrupts.
+func SEI(c *CPU) {
+	c.statusRegister.interruptDisableFlag = true
 	c.programCounter++
 }
 

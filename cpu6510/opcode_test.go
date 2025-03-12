@@ -167,6 +167,21 @@ func TestPLA(t *testing.T) {
 	})
 }
 
+func TestSEI(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+
+	cpu.execute(OpCodeAsHex("SEI"))
+
+	if !cpu.statusRegister.interruptDisableFlag {
+		t.Errorf("Interrupt disable flag should be set")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
 func TestCLV(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
