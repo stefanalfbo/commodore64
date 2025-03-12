@@ -90,6 +90,83 @@ func TestCLI(t *testing.T) {
 	}
 }
 
+func TestPLA(t *testing.T) {
+	t.Run("Pull accumulator", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.ram[0x01FF] = 0x03
+		cpu.stackPointer = 0xFE
+
+		cpu.execute(OpCodeAsHex("PLA"))
+
+		if cpu.accumulator != cpu.ram[0x01FF] {
+			t.Errorf("Accumulator should be set to the value on the stack")
+		}
+
+		if cpu.stackPointer != 0xFF {
+			t.Errorf("Stack pointer should be incremented")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Pull accumulator and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.ram[0x01FF] = 0x00
+		cpu.stackPointer = 0xFE
+
+		cpu.execute(OpCodeAsHex("PLA"))
+
+		if cpu.accumulator != cpu.ram[0x01FF] {
+			t.Errorf("Accumulator should be set to the value on the stack")
+		}
+
+		if cpu.stackPointer != 0xFF {
+			t.Errorf("Stack pointer should be incremented")
+		}
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Pull accumulator and set negative flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.ram[0x01FF] = 0x80
+		cpu.stackPointer = 0xFE
+
+		cpu.execute(OpCodeAsHex("PLA"))
+
+		if cpu.accumulator != cpu.ram[0x01FF] {
+			t.Errorf("Accumulator should be set to the value on the stack")
+		}
+
+		if cpu.stackPointer != 0xFF {
+			t.Errorf("Stack pointer should be incremented")
+		}
+
+		if cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be cleared")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
 func TestCLV(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1

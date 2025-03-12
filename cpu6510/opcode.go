@@ -10,6 +10,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x38: SEC,
 	0x48: PHA,
 	0x58: CLI,
+	0x68: PLA,
 	0x88: DEY,
 	0x8A: TXA,
 	0x98: TYA,
@@ -39,6 +40,7 @@ var opCodes = map[string]byte{
 	"SEC": 0x38,
 	"PHA": 0x48,
 	"CLI": 0x58,
+	"PLA": 0x68,
 	"DEY": 0x88,
 	"TXA": 0x8A,
 	"TYA": 0x98,
@@ -87,6 +89,23 @@ func PHA(c *CPU) {
 // CLI - CLear Interrupt disable flag
 func CLI(c *CPU) {
 	c.statusRegister.interruptDisableFlag = false
+	c.programCounter++
+}
+
+// PLA - PuLl Accumulator. pulls the current value from the stack and places
+// it in the accumulator.
+func PLA(c *CPU) {
+	c.stackPointer++
+	c.accumulator = c.ram[stackBase+uint16(c.stackPointer)]
+
+	if c.accumulator == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if c.accumulator&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+
 	c.programCounter++
 }
 
