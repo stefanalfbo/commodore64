@@ -55,6 +55,16 @@ var opCodes = map[string]byte{
 	"SED": 0xF8,
 }
 
+func raiseStatusRegisterFlags(c *CPU, value byte) {
+	if value == 0 {
+		c.statusRegister.zeroFlag = true
+	}
+
+	if value&0x80 == 0x80 {
+		c.statusRegister.negativeFlag = true
+	}
+}
+
 // BRK - BReaKpoint. BRK is intended for use as a debugging tool which
 // a programmer may place at specific points in a program, to check the state
 // of processor flags at these points in the code.
@@ -96,13 +106,7 @@ func CLI(c *CPU) {
 func PLA(c *CPU) {
 	c.accumulator = c.popFromStack()
 
-	if c.accumulator == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.accumulator&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.accumulator)
 
 	c.programCounter++
 }
@@ -115,13 +119,7 @@ func DEY(c *CPU) {
 	y--
 	c.yRegister = y
 
-	if c.yRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.yRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.yRegister)
 
 	c.programCounter++
 }
@@ -131,13 +129,7 @@ func DEY(c *CPU) {
 func TXA(c *CPU) {
 	c.accumulator = c.xRegister
 
-	if c.accumulator == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.accumulator&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.accumulator)
 
 	c.programCounter++
 }
@@ -147,13 +139,7 @@ func TXA(c *CPU) {
 func TYA(c *CPU) {
 	c.accumulator = c.yRegister
 
-	if c.accumulator == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.accumulator&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.accumulator)
 
 	c.programCounter++
 }
@@ -163,13 +149,7 @@ func TYA(c *CPU) {
 func TAY(c *CPU) {
 	c.yRegister = c.accumulator
 
-	if c.yRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.yRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.yRegister)
 
 	c.programCounter++
 }
@@ -179,13 +159,7 @@ func TAY(c *CPU) {
 func TAX(c *CPU) {
 	c.xRegister = c.accumulator
 
-	if c.xRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.xRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.xRegister)
 
 	c.programCounter++
 }
@@ -204,13 +178,7 @@ func INY(c *CPU) {
 	y++
 	c.yRegister = y
 
-	if c.yRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.yRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.yRegister)
 
 	c.programCounter++
 }
@@ -223,13 +191,7 @@ func DEX(c *CPU) {
 	x--
 	c.xRegister = x
 
-	if c.xRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.xRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.xRegister)
 
 	c.programCounter++
 }
@@ -253,13 +215,7 @@ func INX(c *CPU) {
 	x++
 	c.xRegister = x
 
-	if c.xRegister == 0 {
-		c.statusRegister.zeroFlag = true
-	}
-
-	if c.xRegister&0x80 == 0x80 {
-		c.statusRegister.negativeFlag = true
-	}
+	raiseStatusRegisterFlags(c, c.xRegister)
 
 	c.programCounter++
 }
