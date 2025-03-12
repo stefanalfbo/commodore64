@@ -6,6 +6,7 @@ type OpCodeFunc func(*CPU)
 
 var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
+	0x08: PHP,
 	0x18: CLC,
 	0x38: SEC,
 	0x48: PHA,
@@ -37,6 +38,7 @@ func OpCodeAsHex(name string) byte {
 
 var opCodes = map[string]byte{
 	"BRK": 0x00,
+	"PHP": 0x08,
 	"CLC": 0x18,
 	"SEC": 0x38,
 	"PHA": 0x48,
@@ -76,6 +78,13 @@ func BRK(c *CPU) {
 
 	// BRK increments the program counter by 2 instead of 1
 	c.programCounter += 2
+}
+
+// PHP - PusH Processor status flags. Pushes the current value of the
+// processor status register onto the stack.
+func PHP(c *CPU) {
+	c.pushOnStack(c.statusRegister.asByte())
+	c.programCounter++
 }
 
 // CLC - CLear Carry

@@ -23,12 +23,46 @@ type StatusRegister struct {
 	// Indicates that interrupt request has been triggered by an BRK
 	// opcode (not an IRQ).
 	breakCommandFlag bool // B
+	// Cannot be changed, usually set to 1.
+	unusedFlag bool
 	// Indicates that a result of an signed arithmetic operation
 	// exceeds the signed value range (-128 to 127).
 	overflowFlag bool // V
 	// A value of true indicates that the result is negative (bit 7 is
 	// set, for a two's complement representation).
 	negativeFlag bool // N
+}
+
+// asByte returns the status register as a byte.
+func (sr *StatusRegister) asByte() byte {
+	var value byte
+
+	if sr.carryFlag {
+		value |= 1 << 0
+	}
+	if sr.zeroFlag {
+		value |= 1 << 1
+	}
+	if sr.interruptDisableFlag {
+		value |= 1 << 2
+	}
+	if sr.decimalModeFlag {
+		value |= 1 << 3
+	}
+	if sr.breakCommandFlag {
+		value |= 1 << 4
+	}
+	if sr.unusedFlag {
+		value |= 1 << 5
+	}
+	if sr.overflowFlag {
+		value |= 1 << 6
+	}
+	if sr.negativeFlag {
+		value |= 1 << 7
+	}
+
+	return value
 }
 
 // The CPU struct represents the CPU6510 processor.
@@ -77,6 +111,7 @@ func NewCPU() *CPU {
 			interruptDisableFlag: false,
 			decimalModeFlag:      false,
 			breakCommandFlag:     false,
+			unusedFlag:           true,
 			overflowFlag:         false,
 			negativeFlag:         false,
 		},

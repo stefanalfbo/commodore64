@@ -23,6 +23,53 @@ func TestBRK(t *testing.T) {
 	}
 }
 
+func TestPHP(t *testing.T) {
+	t.Run("Push processor status register flags", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.statusRegister.carryFlag = true
+		cpu.statusRegister.zeroFlag = true
+		cpu.statusRegister.interruptDisableFlag = true
+		cpu.statusRegister.decimalModeFlag = true
+		cpu.statusRegister.breakCommandFlag = true
+		cpu.statusRegister.overflowFlag = true
+		cpu.statusRegister.negativeFlag = true
+
+		cpu.execute(OpCodeAsHex("PHP"))
+
+		if cpu.ram[0x01FF] != 0xFF {
+			t.Errorf("Status register should be pushed onto the stack")
+		}
+
+		if cpu.stackPointer != 0xFE {
+			t.Errorf("Stack pointer should be decremented")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Push processor status register flags when all is cleared", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+
+		cpu.execute(OpCodeAsHex("PHP"))
+
+		if cpu.ram[0x01FF] != 0x20 {
+			t.Errorf("Status register should be pushed onto the stack")
+		}
+
+		if cpu.stackPointer != 0xFE {
+			t.Errorf("Stack pointer should be decremented")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
 func TestCLC(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
