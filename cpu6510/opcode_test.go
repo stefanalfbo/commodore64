@@ -86,6 +86,98 @@ func TestCLC(t *testing.T) {
 	}
 }
 
+func TestPLP(t *testing.T) {
+	t.Run("Pull processor status register flags when all is cleared", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.ram[0x01FF] = 0x20
+		cpu.stackPointer = 0xFE
+
+		cpu.execute(OpCodeAsHex("PLP"))
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be cleared")
+		}
+
+		if cpu.statusRegister.interruptDisableFlag {
+			t.Errorf("Interrupt disable flag should be cleared")
+		}
+
+		if cpu.statusRegister.decimalModeFlag {
+			t.Errorf("Decimal mode flag should be cleared")
+		}
+
+		if cpu.statusRegister.breakCommandFlag {
+			t.Errorf("Break command flag should be cleared")
+		}
+
+		if cpu.statusRegister.overflowFlag {
+			t.Errorf("Overflow flag should be cleared")
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.stackPointer != 0xFF {
+			t.Errorf("Stack pointer should be incremented")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Pull processor status register flags when all is set", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.ram[0x01FF] = 0xFF
+		cpu.stackPointer = 0xFE
+
+		cpu.execute(OpCodeAsHex("PLP"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be set")
+		}
+
+		if !cpu.statusRegister.interruptDisableFlag {
+			t.Errorf("Interrupt disable flag should be set")
+		}
+
+		if !cpu.statusRegister.decimalModeFlag {
+			t.Errorf("Decimal mode flag should be set")
+		}
+
+		if !cpu.statusRegister.breakCommandFlag {
+			t.Errorf("Break command flag should be set")
+		}
+
+		if !cpu.statusRegister.overflowFlag {
+			t.Errorf("Overflow flag should be set")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+
+		if cpu.stackPointer != 0xFF {
+			t.Errorf("Stack pointer should be incremented")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
 func TestSEC(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1

@@ -8,6 +8,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
 	0x08: PHP,
 	0x18: CLC,
+	0x28: PLP,
 	0x38: SEC,
 	0x48: PHA,
 	0x58: CLI,
@@ -40,6 +41,7 @@ var opCodes = map[string]byte{
 	"BRK": 0x00,
 	"PHP": 0x08,
 	"CLC": 0x18,
+	"PLP": 0x28,
 	"SEC": 0x38,
 	"PHA": 0x48,
 	"CLI": 0x58,
@@ -90,6 +92,16 @@ func PHP(c *CPU) {
 // CLC - CLear Carry
 func CLC(c *CPU) {
 	c.statusRegister.carryFlag = false
+	c.programCounter++
+}
+
+// PLP - PuLl Processor status register flags. Pulls the current value from
+// the stack and places it in the processor status register.
+func PLP(c *CPU) {
+	value := c.popFromStack()
+
+	c.statusRegister = newStatusRegister(value)
+
 	c.programCounter++
 }
 

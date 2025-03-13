@@ -33,6 +33,20 @@ type StatusRegister struct {
 	negativeFlag bool // N
 }
 
+// newStatusRegister creates a new status register with the given value.
+func newStatusRegister(value byte) StatusRegister {
+	return StatusRegister{
+		carryFlag:            value&0x01 == 0x01,
+		zeroFlag:             value&0x02 == 0x02,
+		interruptDisableFlag: value&0x04 == 0x04,
+		decimalModeFlag:      value&0x08 == 0x08,
+		breakCommandFlag:     value&0x10 == 0x10,
+		unusedFlag:           value&0x20 == 0x20,
+		overflowFlag:         value&0x40 == 0x40,
+		negativeFlag:         value&0x80 == 0x80,
+	}
+}
+
 // asByte returns the status register as a byte.
 func (sr *StatusRegister) asByte() byte {
 	var value byte
