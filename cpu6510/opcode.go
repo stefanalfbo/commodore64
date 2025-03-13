@@ -20,6 +20,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x9A: TXS,
 	0xA8: TAY,
 	0xAA: TAX,
+	0xBA: TSX,
 	0xB8: CLV,
 	0xC8: INY,
 	0xCA: DEX,
@@ -54,6 +55,7 @@ var opCodes = map[string]byte{
 	"TXS": 0x9A,
 	"TAY": 0xA8,
 	"TAX": 0xAA,
+	"TSX": 0xBA,
 	"CLV": 0xB8,
 	"INY": 0xC8,
 	"DEX": 0xCA,
@@ -197,6 +199,16 @@ func TAY(c *CPU) {
 // X index register.
 func TAX(c *CPU) {
 	c.xRegister = c.accumulator
+
+	raiseStatusRegisterFlags(c, c.xRegister)
+
+	c.programCounter++
+}
+
+// TSX - Transfer Stack pointer to X. copies the current value in the stack
+// pointer to the X index register.
+func TSX(c *CPU) {
+	c.xRegister = c.stackPointer
 
 	raiseStatusRegisterFlags(c, c.xRegister)
 

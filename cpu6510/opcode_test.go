@@ -395,6 +395,63 @@ func TestSED(t *testing.T) {
 	}
 }
 
+func TestTSX(t *testing.T) {
+
+	t.Run("Transfer stack pointer to X", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.stackPointer = 0x03
+
+		cpu.execute(OpCodeAsHex("TSX"))
+
+		if cpu.xRegister != cpu.stackPointer {
+			t.Errorf("X register should be set to the value of the stack pointer")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Transfer stack pointer to X and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.stackPointer = 0x00
+
+		cpu.execute(OpCodeAsHex("TSX"))
+
+		if cpu.xRegister != cpu.stackPointer {
+			t.Errorf("X register should be set to the value of the stack pointer")
+		}
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be set")
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+	})
+
+	t.Run("Transfer stack pointer to X and set negative flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.stackPointer = 0x80
+
+		cpu.execute(OpCodeAsHex("TSX"))
+
+		if cpu.xRegister != cpu.stackPointer {
+			t.Errorf("X register should be set to the value of the stack pointer")
+		}
+
+		if cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be cleared")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
 func TestRegisterInstructionsImpliedMode(t *testing.T) {
 	t.Run("DEY - Decrement Y register", func(t *testing.T) {
 		t.Run("Decrement Y register", func(t *testing.T) {
