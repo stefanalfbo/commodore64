@@ -12,6 +12,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x38: SEC,
 	0x48: PHA,
 	0x58: CLI,
+	0x60: RTS,
 	0x68: PLA,
 	0x78: SEI,
 	0x88: DEY,
@@ -47,6 +48,7 @@ var opCodes = map[string]byte{
 	"SEC": 0x38,
 	"PHA": 0x48,
 	"CLI": 0x58,
+	"RTS": 0x60,
 	"PLA": 0x68,
 	"SEI": 0x78,
 	"DEY": 0x88,
@@ -125,6 +127,18 @@ func PHA(c *CPU) {
 // CLI - CLear Interrupt disable flag
 func CLI(c *CPU) {
 	c.statusRegister.interruptDisableFlag = false
+	c.programCounter++
+}
+
+// RTS - ReTurn from Subroutine. pulls the program counter from the stack and
+// places it in the program counter.
+func RTS(c *CPU) {
+	lowByte := c.popFromStack()
+	highByte := c.popFromStack()
+
+	programCounterAddress := (uint16(highByte) << 8) | uint16(lowByte)
+
+	c.programCounter = programCounterAddress
 	c.programCounter++
 }
 

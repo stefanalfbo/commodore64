@@ -229,6 +229,21 @@ func TestCLI(t *testing.T) {
 	}
 }
 
+func TestRTS(t *testing.T) {
+	t.Run("Return from subroutine", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0x01FE] = 0x03
+		cpu.ram[0x01FF] = 0x00
+		cpu.stackPointer = 0xFD
+
+		cpu.execute(OpCodeAsHex("RTS"))
+
+		if cpu.programCounter != 0x0004 {
+			t.Errorf("Program counter should be set to the address on the stack")
+		}
+	})
+}
+
 func TestPLA(t *testing.T) {
 	t.Run("Pull accumulator", func(t *testing.T) {
 		cpu := NewCPU()
