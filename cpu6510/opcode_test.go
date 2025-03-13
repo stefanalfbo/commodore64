@@ -348,6 +348,22 @@ func TestNOP(t *testing.T) {
 	}
 }
 
+func TestTXS(t *testing.T) {
+	cpu := NewCPU()
+	expectedPC := cpu.programCounter + 1
+	cpu.xRegister = 0x03
+
+	cpu.execute(OpCodeAsHex("TXS"))
+
+	if cpu.stackPointer != cpu.xRegister {
+		t.Errorf("Stack pointer should be set to the value of the X register")
+	}
+
+	if cpu.programCounter != expectedPC {
+		t.Errorf("Program counter should be incremented")
+	}
+}
+
 func TestCLD(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
