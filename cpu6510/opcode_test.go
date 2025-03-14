@@ -23,6 +23,72 @@ func TestBRK(t *testing.T) {
 	}
 }
 
+func TestASLAccumulator(t *testing.T) {
+	t.Run("Shift all bits in the accumulator", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.accumulator = 0x03
+
+		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+
+		if cpu.accumulator != 0x06 {
+			t.Errorf("Accumulator should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the accumulator and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.accumulator = 0x80
+
+		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+
+		if cpu.accumulator != 0x00 {
+			t.Errorf("Accumulator should be shifted left")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the accumulator and set negative flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.accumulator = 0x40
+
+		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+
+		if cpu.accumulator != 0x80 {
+			t.Errorf("Accumulator should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
 func TestPHP(t *testing.T) {
 	t.Run("Push processor status register flags", func(t *testing.T) {
 		cpu := NewCPU()

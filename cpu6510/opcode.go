@@ -6,6 +6,7 @@ type OpCodeFunc func(*CPU)
 
 var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
+	0x0A: ASLAccumulator,
 	0x08: PHP,
 	0x18: CLC,
 	0x28: PLP,
@@ -41,32 +42,35 @@ func OpCodeAsHex(name string) byte {
 }
 
 var opCodes = map[string]byte{
-	"BRK": 0x00,
-	"PHP": 0x08,
-	"CLC": 0x18,
-	"PLP": 0x28,
-	"SEC": 0x38,
-	"PHA": 0x48,
-	"CLI": 0x58,
-	"RTS": 0x60,
-	"PLA": 0x68,
-	"SEI": 0x78,
-	"DEY": 0x88,
-	"TXA": 0x8A,
-	"TYA": 0x98,
-	"TXS": 0x9A,
-	"TAY": 0xA8,
-	"TAX": 0xAA,
-	"TSX": 0xBA,
-	"CLV": 0xB8,
-	"INY": 0xC8,
-	"DEX": 0xCA,
-	"CLD": 0xD8,
-	"NOP": 0xEA,
-	"INX": 0xE8,
-	"SED": 0xF8,
+	"BRK":            0x00,
+	"ASLAccumulator": 0x0A,
+	"PHP":            0x08,
+	"CLC":            0x18,
+	"PLP":            0x28,
+	"SEC":            0x38,
+	"PHA":            0x48,
+	"CLI":            0x58,
+	"RTS":            0x60,
+	"PLA":            0x68,
+	"SEI":            0x78,
+	"DEY":            0x88,
+	"TXA":            0x8A,
+	"TYA":            0x98,
+	"TXS":            0x9A,
+	"TAY":            0xA8,
+	"TAX":            0xAA,
+	"TSX":            0xBA,
+	"CLV":            0xB8,
+	"INY":            0xC8,
+	"DEX":            0xCA,
+	"CLD":            0xD8,
+	"NOP":            0xEA,
+	"INX":            0xE8,
+	"SED":            0xF8,
 }
 
+// raiseStatusRegisterFlags - sets the zero and negative flags in the status
+// register based on the value passed in.
 func raiseStatusRegisterFlags(c *CPU, value byte) {
 	if value == 0 {
 		c.statusRegister.zeroFlag = true
@@ -86,6 +90,18 @@ func BRK(c *CPU) {
 
 	// BRK increments the program counter by 2 instead of 1
 	c.programCounter += 2
+}
+
+// ASLAccumulator - Arithmetic Shift Left. ASL shifts all bits in the
+// accumulator.
+func ASLAccumulator(c *CPU) {
+	c.statusRegister.carryFlag = c.accumulator&0x80 == 0x80
+
+	c.accumulator <<= 1
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
 }
 
 // PHP - PusH Processor status flags. Pushes the current value of the
