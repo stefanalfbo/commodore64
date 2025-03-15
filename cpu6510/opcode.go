@@ -6,6 +6,7 @@ type OpCodeFunc func(*CPU)
 
 var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
+	0x06: ASLZeroPage,
 	0x0A: ASLAccumulator,
 	0x0E: ASLAbsolute,
 	0x08: PHP,
@@ -45,6 +46,7 @@ func OpCodeAsHex(name string) byte {
 
 var opCodes = map[string]byte{
 	"BRK":            0x00,
+	"ASLZeroPage":    0x06,
 	"ASLAccumulator": 0x0A,
 	"ASLAbsolute":    0x0E,
 	"PHP":            0x08,
@@ -99,6 +101,26 @@ func BRK(c *CPU) {
 
 	// BRK increments the program counter by 2 instead of 1
 	c.programCounter += 2
+}
+
+// ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
+// location specified by the single byte address.
+func ASLZeroPage(c *CPU) {
+	c.programCounter++
+
+	address := uint16(c.ram[c.programCounter])
+
+	value := c.readMemory(address)
+
+	c.statusRegister.carryFlag = value&0x80 == 0x80
+
+	value <<= 1
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+
+	c.programCounter++
 }
 
 // ASLAccumulator - Arithmetic Shift Left. ASL shifts all bits in the

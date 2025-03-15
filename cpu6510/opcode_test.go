@@ -46,6 +46,70 @@ func TestBRK(t *testing.T) {
 	}
 }
 
+func TestASLZeroPage(t *testing.T) {
+	t.Run("Shift all bits in the memory location specified by the single byte address", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x03
+
+		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x06 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the memory location specified by the single byte address and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x80
+
+		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x00 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the memory location specified by the single byte address and set negative flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x40
+
+		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x80 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
 func TestASLAccumulator(t *testing.T) {
 	t.Run("Shift all bits in the accumulator", func(t *testing.T) {
 		cpu := NewCPU()
