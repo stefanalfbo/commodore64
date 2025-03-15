@@ -10,6 +10,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x0A: ASLAccumulator,
 	0x0E: ASLAbsolute,
 	0x08: PHP,
+	0x16: ASLZeroPageX,
 	0x18: CLC,
 	0x1E: ASLAbsoluteX,
 	0x28: PLP,
@@ -50,6 +51,7 @@ var opCodes = map[string]byte{
 	"ASLAccumulator": 0x0A,
 	"ASLAbsolute":    0x0E,
 	"PHP":            0x08,
+	"ASLZeroPageX":   0x16,
 	"CLC":            0x18,
 	"ASLAbsoluteX":   0x1E,
 	"PLP":            0x28,
@@ -165,6 +167,26 @@ func ASLAbsolute(c *CPU) {
 // processor status register onto the stack.
 func PHP(c *CPU) {
 	c.pushOnStack(c.statusRegister.asByte())
+	c.programCounter++
+}
+
+// ASLZeroPageX - Arithmetic Shift Left. ASL shifts all bits in the memory
+// location specified by the single byte address plus the X index register.
+func ASLZeroPageX(c *CPU) {
+	c.programCounter++
+
+	address := uint16(c.ram[c.programCounter] + c.xRegister)
+
+	value := c.readMemory(address)
+
+	c.statusRegister.carryFlag = setCarryFlag(value)
+
+	value <<= 1
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+
 	c.programCounter++
 }
 
