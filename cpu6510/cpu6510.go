@@ -153,6 +153,24 @@ func (c *CPU) next() byte {
 	return instruction
 }
 
+// readAddressFromMemory reads the address from the next two bytes in memory.
+func (c *CPU) readAddressFromMemory() uint16 {
+	var lowByte byte = c.ram[c.programCounter]
+	var highByte byte = c.ram[c.programCounter+1]
+
+	return convertTwoBytesToAddress(highByte, lowByte)
+}
+
+// readMemory reads the byte at the given address in memory.
+func (c *CPU) readMemory(address uint16) byte {
+	return c.ram[address]
+}
+
+// writeMemory writes the byte at the given address in memory.
+func (c *CPU) writeMemory(address uint16, value byte) {
+	c.ram[address] = value
+}
+
 // Execute executes the instruction.
 func (c *CPU) execute(instruction byte) {
 	if runOpCode, ok := lookupOpCode[instruction]; ok {

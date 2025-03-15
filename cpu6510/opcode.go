@@ -7,6 +7,7 @@ type OpCodeFunc func(*CPU)
 var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
 	0x0A: ASLAccumulator,
+	0x0E: ASLAbsolute,
 	0x08: PHP,
 	0x18: CLC,
 	0x28: PLP,
@@ -44,6 +45,7 @@ func OpCodeAsHex(name string) byte {
 var opCodes = map[string]byte{
 	"BRK":            0x00,
 	"ASLAccumulator": 0x0A,
+	"ASLAbsolute":    0x0E,
 	"PHP":            0x08,
 	"CLC":            0x18,
 	"PLP":            0x28,
@@ -67,6 +69,11 @@ var opCodes = map[string]byte{
 	"NOP":            0xEA,
 	"INX":            0xE8,
 	"SED":            0xF8,
+}
+
+// convertTwoBytesToAddress - converts two bytes into a single address.
+func convertTwoBytesToAddress(highByte, lowByte byte) uint16 {
+	return (uint16(highByte) << 8) | uint16(lowByte)
 }
 
 // raiseStatusRegisterFlags - sets the zero and negative flags in the status
@@ -102,6 +109,26 @@ func ASLAccumulator(c *CPU) {
 	raiseStatusRegisterFlags(c, c.accumulator)
 
 	c.programCounter++
+}
+
+// ASLAbsolute - Arithmetic Shift Left. ASL shifts all bits in the memory
+// location specified by the two byte address.
+func ASLAbsolute(c *CPU) {
+	c.programCounter++
+
+	address := c.readAddressFromMemory()
+
+	value := c.readMemory(address)
+
+	c.statusRegister.carryFlag = value&0x80 == 0x80
+
+	value <<= 1
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+
+	c.programCounter += 2
 }
 
 // PHP - PusH Processor status flags. Pushes the current value of the
@@ -152,7 +179,7 @@ func RTS(c *CPU) {
 	lowByte := c.popFromStack()
 	highByte := c.popFromStack()
 
-	programCounterAddress := (uint16(highByte) << 8) | uint16(lowByte)
+	programCounterAddress := convertTwoBytesToAddress(highByte, lowByte)
 
 	c.programCounter = programCounterAddress
 	c.programCounter++
