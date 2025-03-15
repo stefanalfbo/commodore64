@@ -80,6 +80,12 @@ func convertTwoBytesToAddress(highByte, lowByte byte) uint16 {
 	return (uint16(highByte) << 8) | uint16(lowByte)
 }
 
+// setCarryFlag - returns true if the originally value in bit 7
+// was set, otherwise false.
+func setCarryFlag(value byte) bool {
+	return value&0x80 == 0x80
+}
+
 // raiseStatusRegisterFlags - sets the zero and negative flags in the status
 // register based on the value passed in.
 func raiseStatusRegisterFlags(c *CPU, value byte) {
@@ -112,7 +118,7 @@ func ASLZeroPage(c *CPU) {
 
 	value := c.readMemory(address)
 
-	c.statusRegister.carryFlag = value&0x80 == 0x80
+	c.statusRegister.carryFlag = setCarryFlag(value)
 
 	value <<= 1
 
@@ -144,7 +150,7 @@ func ASLAbsolute(c *CPU) {
 
 	value := c.readMemory(address)
 
-	c.statusRegister.carryFlag = value&0x80 == 0x80
+	c.statusRegister.carryFlag = setCarryFlag(value)
 
 	value <<= 1
 
@@ -180,7 +186,7 @@ func ASLAbsoluteX(c *CPU) {
 
 	value := c.readMemory(address)
 
-	c.statusRegister.carryFlag = value&0x80 == 0x80
+	c.statusRegister.carryFlag = setCarryFlag(value)
 
 	value <<= 1
 
