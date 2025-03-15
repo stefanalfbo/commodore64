@@ -10,6 +10,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0x0E: ASLAbsolute,
 	0x08: PHP,
 	0x18: CLC,
+	0x1E: ASLAbsoluteX,
 	0x28: PLP,
 	0x38: SEC,
 	0x48: PHA,
@@ -48,6 +49,7 @@ var opCodes = map[string]byte{
 	"ASLAbsolute":    0x0E,
 	"PHP":            0x08,
 	"CLC":            0x18,
+	"ASLAbsoluteX":   0x1E,
 	"PLP":            0x28,
 	"SEC":            0x38,
 	"PHA":            0x48,
@@ -142,6 +144,29 @@ func PHP(c *CPU) {
 func CLC(c *CPU) {
 	c.statusRegister.carryFlag = false
 	c.programCounter++
+}
+
+// ASLAbsoluteX - Arithmetic Shift Left. ASL shifts all bits in the memory
+// location specified by the two byte address plus the X index register.
+func ASLAbsoluteX(c *CPU) {
+	c.programCounter++
+
+	// Indexed absolute addressing is an addressing mode in which the
+	// contents of the X register is added to a given base address, to
+	// obtain the "target" address.
+	address := c.readAddressFromMemory() + uint16(c.xRegister)
+
+	value := c.readMemory(address)
+
+	c.statusRegister.carryFlag = value&0x80 == 0x80
+
+	value <<= 1
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+
+	c.programCounter += 2
 }
 
 // PLP - PuLl Processor status register flags. Pulls the current value from
