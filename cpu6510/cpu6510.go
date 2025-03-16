@@ -158,7 +158,7 @@ func (c *CPU) readAddressFromMemory() uint16 {
 	var lowByte byte = c.ram[c.programCounter]
 	var highByte byte = c.ram[c.programCounter+1]
 
-	return convertTwoBytesToAddress(highByte, lowByte)
+	return ConvertTwoBytesToAddress(highByte, lowByte)
 }
 
 // readMemory reads the byte at the given address in memory.

@@ -20,7 +20,7 @@ func TestConvertTwoBytesToAddress(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		address := convertTwoBytesToAddress(test.high, test.low)
+		address := ConvertTwoBytesToAddress(test.high, test.low)
 		if address != test.expected {
 			t.Errorf("Address should be %04x, got %04x for high:%02x low:%02x", test.expected, address, test.high, test.low)
 		}

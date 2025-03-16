@@ -77,8 +77,8 @@ var opCodes = map[string]byte{
 	"SED":            0xF8,
 }
 
-// convertTwoBytesToAddress - converts two bytes into a single address.
-func convertTwoBytesToAddress(highByte, lowByte byte) uint16 {
+// ConvertTwoBytesToAddress - converts two bytes into a single address.
+func ConvertTwoBytesToAddress(highByte, lowByte byte) uint16 {
 	return (uint16(highByte) << 8) | uint16(lowByte)
 }
 
@@ -254,7 +254,7 @@ func RTS(c *CPU) {
 	lowByte := c.popFromStack()
 	highByte := c.popFromStack()
 
-	programCounterAddress := convertTwoBytesToAddress(highByte, lowByte)
+	programCounterAddress := ConvertTwoBytesToAddress(highByte, lowByte)
 
 	c.programCounter = programCounterAddress
 	c.programCounter++
