@@ -77,7 +77,7 @@ func zeroPage(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%02X\n", mnemonic, address)
+	fmt.Printf("%s $%02X\n", mnemonic, address)
 }
 
 // zeroPageX reads the next byte from the buffer and prints the mnemonic with
@@ -87,7 +87,7 @@ func zeroPageX(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%02X, X\n", mnemonic, address)
+	fmt.Printf("%s $%02X, X\n", mnemonic, address)
 }
 
 // zeroPageY reads the next byte from the buffer and prints the mnemonic with
@@ -97,7 +97,7 @@ func zeroPageY(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%02X, Y\n", mnemonic, address)
+	fmt.Printf("%s $%02X, Y\n", mnemonic, address)
 }
 
 // immediate reads the next byte from the buffer and prints the mnemonic with
@@ -107,7 +107,7 @@ func immediate(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s #0x%02X\n", mnemonic, address)
+	fmt.Printf("%s #$%02X\n", mnemonic, address)
 }
 
 // indirect reads the next two bytes from the buffer and prints the mnemonic
@@ -137,7 +137,7 @@ func indexedIndirect(buffer io.Reader, mnemonic string, register string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s (0x%02X), %s\n", mnemonic, address, register)
+	fmt.Printf("%s ($%02X), %s\n", mnemonic, address, register)
 }
 
 // absolute reads the next two bytes from the buffer and prints the mnemonic
@@ -147,7 +147,7 @@ func absolute(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%04X\n", mnemonic, address)
+	fmt.Printf("%s $%04X\n", mnemonic, address)
 }
 
 // absoluteX reads the next two bytes from the buffer and prints the mnemonic
@@ -157,7 +157,7 @@ func absoluteX(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%04X, X\n", mnemonic, address)
+	fmt.Printf("%s $%04X, X\n", mnemonic, address)
 }
 
 // absoluteY reads the next two bytes from the buffer and prints the mnemonic
@@ -167,7 +167,7 @@ func absoluteY(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%04X, Y\n", mnemonic, address)
+	fmt.Printf("%s $%04X, Y\n", mnemonic, address)
 }
 
 // relative reads the next byte from the buffer and prints the mnemonic with
@@ -177,7 +177,7 @@ func relative(buffer io.Reader, mnemonic string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s 0x%02X\n", mnemonic, address)
+	fmt.Printf("%s $%02X\n", mnemonic, address)
 }
 
 // accumulator prints the mnemonic with the accumulator register.
