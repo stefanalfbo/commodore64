@@ -1,48 +1,33 @@
 package main
 
 import (
-	"bytes"
+	"flag"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/stefanalfbo/commodore64/cpu6510"
 )
 
 func main() {
-	buffer := []byte{
-		0x00,
-		0x01,
-		0x23,
-		0x05,
-		0x32,
-		0x06,
-		0x42,
-		0x08,
-		0x09,
-		0x12,
-		0x0A,
-		0x0D,
-		0x04,
-		0x05,
-		0x0E,
-		0x01,
-		0x02,
-		0x10,
-		0x34,
-		0x11,
-		0x22,
-		0x15,
-		0x44,
-		0x16,
-		0xF9,
-		0x18,
-		0x19,
-		0x33,
-		0x33,
-		0x1D,
-		0x12,
-		0x13}
-	run(bytes.NewReader(buffer))
+	filePath := flag.String("file", "", "Path to file (reads from stdin if empty)")
+	flag.Parse()
+
+	var reader io.Reader
+	if *filePath == "" {
+		// No file provided? Read from stdin
+		reader = os.Stdin
+	} else {
+		file, err := os.Open(*filePath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to open file %q: %v\n", *filePath, err)
+			os.Exit(1)
+		}
+		defer file.Close()
+		reader = file
+	}
+
+	run(reader)
 }
 
 // Run loops through 'buffer' from PC=0 until we reach the end of the buffer,
@@ -507,6 +492,7 @@ func disassemble(buffer io.Reader, code byte) {
 	case 0xFE:
 		absoluteX(buffer, "INC")
 	default:
-		panic("Unknown operation code")
+		message := fmt.Sprintf("Unknown operation code, %x", code)
+		panic(message)
 	}
 }
