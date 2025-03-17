@@ -30,6 +30,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xB8: CLV,
 	0xC8: INY,
 	0xCA: DEX,
+	0xC9: CMPImmediate,
 	0xD8: CLD,
 	0xEA: NOP,
 	0xE8: INX,
@@ -71,6 +72,7 @@ var opCodes = map[string]byte{
 	"CLV":            0xB8,
 	"INY":            0xC8,
 	"DEX":            0xCA,
+	"CMPImmediate":   0xC9,
 	"CLD":            0xD8,
 	"NOP":            0xEA,
 	"INX":            0xE8,
@@ -377,6 +379,21 @@ func DEX(c *CPU) {
 	raiseStatusRegisterFlags(c, c.xRegister)
 
 	c.programCounter++
+}
+
+// CMPImmediate - CoMPare. CMP compares the value in the accumulator with the
+// value in memory, and sets the zero and negative flags in the status register
+// based on the result.
+func CMPImmediate(c *CPU) {
+	c.programCounter++
+
+	value := c.ram[c.programCounter]
+
+	tmp := c.accumulator - value
+
+	raiseStatusRegisterFlags(c, tmp)
+
+	c.statusRegister.carryFlag = c.accumulator >= value
 }
 
 // CLD - CLear Decimal flag
