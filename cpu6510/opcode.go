@@ -31,6 +31,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xC8: INY,
 	0xCA: DEX,
 	0xC9: CMPImmediate,
+	0xCD: CMPAbsolute,
 	0xD8: CLD,
 	0xEA: NOP,
 	0xE8: INX,
@@ -73,6 +74,7 @@ var opCodes = map[string]byte{
 	"INY":            0xC8,
 	"DEX":            0xCA,
 	"CMPImmediate":   0xC9,
+	"CMPAbsolute":    0xCD,
 	"CLD":            0xD8,
 	"NOP":            0xEA,
 	"INX":            0xE8,
@@ -381,6 +383,14 @@ func DEX(c *CPU) {
 	c.programCounter++
 }
 
+func cmp(c *CPU, value byte) {
+	tmp := c.accumulator - value
+
+	raiseStatusRegisterFlags(c, tmp)
+
+	c.statusRegister.carryFlag = c.accumulator >= value
+}
+
 // CMPImmediate - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
@@ -389,11 +399,22 @@ func CMPImmediate(c *CPU) {
 
 	value := c.ram[c.programCounter]
 
-	tmp := c.accumulator - value
+	cmp(c, value)
+}
 
-	raiseStatusRegisterFlags(c, tmp)
+// CMPAbsolute - CoMPare. CMP compares the value in the accumulator with the
+// value in memory, and sets the zero and negative flags in the status register
+// based on the result.
+func CMPAbsolute(c *CPU) {
+	c.programCounter++
 
-	c.statusRegister.carryFlag = c.accumulator >= value
+	address := c.readAddressFromMemory()
+
+	value := c.readMemory(address)
+
+	cmp(c, value)
+
+	c.programCounter += 2
 }
 
 // CLD - CLear Decimal flag
