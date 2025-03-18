@@ -33,6 +33,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xC9: CMPImmediate,
 	0xCD: CMPAbsolute,
 	0xD8: CLD,
+	0xDD: CMPAbsoluteX,
 	0xEA: NOP,
 	0xE8: INX,
 	0xF8: SED,
@@ -76,6 +77,7 @@ var opCodes = map[string]byte{
 	"CMPImmediate":   0xC9,
 	"CMPAbsolute":    0xCD,
 	"CLD":            0xD8,
+	"CMPAbsoluteX":   0xDD,
 	"NOP":            0xEA,
 	"INX":            0xE8,
 	"SED":            0xF8,
@@ -409,6 +411,21 @@ func CMPAbsolute(c *CPU) {
 	c.programCounter++
 
 	address := c.readAddressFromMemory()
+
+	value := c.readMemory(address)
+
+	cmp(c, value)
+
+	c.programCounter += 2
+}
+
+// CMPAbsoluteX - CoMPare. CMP compares the value in the accumulator with the
+// value in memory, and sets the zero and negative flags in the status register
+// based on the result.
+func CMPAbsoluteX(c *CPU) {
+	c.programCounter++
+
+	address := c.readAddressFromMemory() + uint16(c.xRegister)
 
 	value := c.readMemory(address)
 
