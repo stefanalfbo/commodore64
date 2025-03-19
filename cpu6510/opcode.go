@@ -34,6 +34,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xC9: CMPImmediate,
 	0xCA: DEX,
 	0xCD: CMPAbsolute,
+	0xD1: CMPIndirectIndexedY,
 	0xD5: CMPZeroPageX,
 	0xD8: CLD,
 	0xD9: CMPAbsoluteY,
@@ -82,6 +83,7 @@ var opCodes = map[string]byte{
 	"CMPImmediate":        0xC9,
 	"DEX":                 0xCA,
 	"CMPAbsolute":         0xCD,
+	"CMPIndirectIndexedY": 0xD1,
 	"CMPZeroPageX":        0xD5,
 	"CLD":                 0xD8,
 	"CMPAbsoluteY":        0xD9,
@@ -479,6 +481,21 @@ func CMPIndexedIndirectX(c *CPU) {
 	c.programCounter++
 
 	address := uint8(c.ram[c.programCounter]) + uint8(c.xRegister)
+
+	value := c.readMemory(uint16(address))
+
+	cmp(c, value)
+
+	c.programCounter++
+}
+
+// CMPIndirectIndexedY - CoMPare. CMP compares the value in the accumulator with
+// the value in memory, and sets the zero and negative flags in the status
+// register based on the result.
+func CMPIndirectIndexedY(c *CPU) {
+	c.programCounter++
+
+	address := uint8(c.ram[c.programCounter]) + uint8(c.yRegister)
 
 	value := c.readMemory(uint16(address))
 
