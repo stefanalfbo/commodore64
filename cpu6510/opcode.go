@@ -28,6 +28,7 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xAA: TAX,
 	0xBA: TSX,
 	0xB8: CLV,
+	0xC1: CMPIndexedIndirectX,
 	0xC5: CMPZeroPage,
 	0xC8: INY,
 	0xC9: CMPImmediate,
@@ -52,41 +53,42 @@ func OpCodeAsHex(name string) byte {
 }
 
 var opCodes = map[string]byte{
-	"BRK":            0x00,
-	"ASLZeroPage":    0x06,
-	"ASLAccumulator": 0x0A,
-	"ASLAbsolute":    0x0E,
-	"PHP":            0x08,
-	"ASLZeroPageX":   0x16,
-	"CLC":            0x18,
-	"ASLAbsoluteX":   0x1E,
-	"PLP":            0x28,
-	"SEC":            0x38,
-	"PHA":            0x48,
-	"CLI":            0x58,
-	"RTS":            0x60,
-	"PLA":            0x68,
-	"SEI":            0x78,
-	"DEY":            0x88,
-	"TXA":            0x8A,
-	"TYA":            0x98,
-	"TXS":            0x9A,
-	"TAY":            0xA8,
-	"TAX":            0xAA,
-	"TSX":            0xBA,
-	"CLV":            0xB8,
-	"CMPZeroPage":    0xC5,
-	"INY":            0xC8,
-	"DEX":            0xCA,
-	"CMPImmediate":   0xC9,
-	"CMPAbsolute":    0xCD,
-	"CMPZeroPageX":   0xD5,
-	"CLD":            0xD8,
-	"CMPAbsoluteY":   0xD9,
-	"CMPAbsoluteX":   0xDD,
-	"NOP":            0xEA,
-	"INX":            0xE8,
-	"SED":            0xF8,
+	"BRK":                 0x00,
+	"ASLZeroPage":         0x06,
+	"ASLAccumulator":      0x0A,
+	"ASLAbsolute":         0x0E,
+	"PHP":                 0x08,
+	"ASLZeroPageX":        0x16,
+	"CLC":                 0x18,
+	"ASLAbsoluteX":        0x1E,
+	"PLP":                 0x28,
+	"SEC":                 0x38,
+	"PHA":                 0x48,
+	"CLI":                 0x58,
+	"RTS":                 0x60,
+	"PLA":                 0x68,
+	"SEI":                 0x78,
+	"DEY":                 0x88,
+	"TXA":                 0x8A,
+	"TYA":                 0x98,
+	"TXS":                 0x9A,
+	"TAY":                 0xA8,
+	"TAX":                 0xAA,
+	"TSX":                 0xBA,
+	"CLV":                 0xB8,
+	"CMPIndexedIndirectX": 0xC1,
+	"CMPZeroPage":         0xC5,
+	"INY":                 0xC8,
+	"CMPImmediate":        0xC9,
+	"DEX":                 0xCA,
+	"CMPAbsolute":         0xCD,
+	"CMPZeroPageX":        0xD5,
+	"CLD":                 0xD8,
+	"CMPAbsoluteY":        0xD9,
+	"CMPAbsoluteX":        0xDD,
+	"NOP":                 0xEA,
+	"INX":                 0xE8,
+	"SED":                 0xF8,
 }
 
 // ConvertTwoBytesToAddress - converts two bytes into a single address.
@@ -470,7 +472,22 @@ func CMPAbsoluteX(c *CPU) {
 	c.programCounter += 2
 }
 
-// / CMPZeroPage - CoMPare. CMP compares the value in the accumulator with the
+// CMPIndexedIndirectX - CoMPare. CMP compares the value in the accumulator with
+// the value in memory, and sets the zero and negative flags in the status
+// register based on the result.
+func CMPIndexedIndirectX(c *CPU) {
+	c.programCounter++
+
+	address := uint8(c.ram[c.programCounter]) + uint8(c.xRegister)
+
+	value := c.readMemory(uint16(address))
+
+	cmp(c, value)
+
+	c.programCounter++
+}
+
+// CMPZeroPage - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPZeroPage(c *CPU) {
