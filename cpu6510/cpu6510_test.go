@@ -34,7 +34,7 @@ func TestStatusRegister(t *testing.T) {
 		t.Run("Set the carry flag", func(t *testing.T) {
 			cpu := NewCPU()
 
-			cpu.execute(OpCodeAsHex("SEC"))
+			cpu.execute(InstructionAsHex("SEC"))
 
 			if !cpu.statusRegister.carryFlag {
 				t.Errorf("Carry flag should be set")
@@ -45,7 +45,7 @@ func TestStatusRegister(t *testing.T) {
 			cpu := NewCPU()
 			cpu.statusRegister.carryFlag = true
 
-			cpu.execute(OpCodeAsHex("CLC"))
+			cpu.execute(InstructionAsHex("CLC"))
 
 			if cpu.statusRegister.carryFlag {
 				t.Errorf("Carry flag should be cleared")
@@ -58,7 +58,7 @@ func TestStatusRegister(t *testing.T) {
 			cpu := NewCPU()
 			cpu.statusRegister.interruptDisableFlag = true
 
-			cpu.execute(OpCodeAsHex("CLI"))
+			cpu.execute(InstructionAsHex("CLI"))
 
 			if cpu.statusRegister.interruptDisableFlag {
 				t.Errorf("Interrupt disable flag should be cleared")
@@ -68,7 +68,7 @@ func TestStatusRegister(t *testing.T) {
 		t.Run("Set the interrupt disable flag", func(t *testing.T) {
 			cpu := NewCPU()
 
-			cpu.execute(OpCodeAsHex("BRK"))
+			cpu.execute(InstructionAsHex("BRK"))
 
 			if !cpu.statusRegister.interruptDisableFlag {
 				t.Errorf("Interrupt disable flag should be set")
@@ -81,7 +81,7 @@ func TestStatusRegister(t *testing.T) {
 			cpu := NewCPU()
 			cpu.statusRegister.decimalModeFlag = true
 
-			cpu.execute(OpCodeAsHex("CLD"))
+			cpu.execute(InstructionAsHex("CLD"))
 
 			if cpu.statusRegister.decimalModeFlag {
 				t.Errorf("Decimal mode flag should be cleared")
@@ -91,7 +91,7 @@ func TestStatusRegister(t *testing.T) {
 		t.Run("Set the decimal mode flag", func(t *testing.T) {
 			cpu := NewCPU()
 
-			cpu.execute(OpCodeAsHex("SED"))
+			cpu.execute(InstructionAsHex("SED"))
 
 			if !cpu.statusRegister.decimalModeFlag {
 				t.Errorf("Decimal mode flag should be set")
@@ -103,7 +103,7 @@ func TestStatusRegister(t *testing.T) {
 		t.Run("Set the break status flag", func(t *testing.T) {
 			cpu := NewCPU()
 
-			cpu.execute(OpCodeAsHex("BRK"))
+			cpu.execute(InstructionAsHex("BRK"))
 
 			if !cpu.statusRegister.breakCommandFlag {
 				t.Errorf("Break status flag should be set")
@@ -116,7 +116,7 @@ func TestStatusRegister(t *testing.T) {
 			cpu := NewCPU()
 			cpu.statusRegister.overflowFlag = true
 
-			cpu.execute(OpCodeAsHex("CLV"))
+			cpu.execute(InstructionAsHex("CLV"))
 
 			if cpu.statusRegister.overflowFlag {
 				t.Errorf("Overflow flag should be cleared")

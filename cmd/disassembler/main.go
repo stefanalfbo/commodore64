@@ -30,19 +30,19 @@ func main() {
 	run(reader)
 }
 
-// Run loops through 'buffer' from PC=0 until we reach the end of the buffer,
+// Run loops through 'buffer' until we reach the end of the buffer,
 // disassembling each instruction in turn.
 func run(buffer io.Reader) error {
-	code := make([]byte, 1)
+	instruction := make([]byte, 1)
 	for {
-		_, err := buffer.Read(code)
+		_, err := buffer.Read(instruction)
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		disassemble(buffer, code[0])
+		disassemble(buffer, instruction[0])
 	}
 
 	return nil
@@ -185,10 +185,9 @@ func accumulator(mnemonic string) {
 	fmt.Printf("%s A\n", mnemonic)
 }
 
-// Disassemble reads the opcode at 'pc' from 'buffer', prints its assembly, and
-// returns how many bytes that opcode consumed (i.e. how much to advance 'pc').
-func disassemble(buffer io.Reader, code byte) {
-	switch code {
+// Disassemble reads the instructions from 'buffer', prints its assembly
+func disassemble(buffer io.Reader, instruction byte) {
+	switch instruction {
 	case 0x00:
 		fmt.Println("BRK")
 	case 0x01:
@@ -492,7 +491,7 @@ func disassemble(buffer io.Reader, code byte) {
 	case 0xFE:
 		absoluteX(buffer, "INC")
 	default:
-		message := fmt.Sprintf("Unknown operation code, %x", code)
+		message := fmt.Sprintf("Unknown instruction, %x", instruction)
 		panic(message)
 	}
 }

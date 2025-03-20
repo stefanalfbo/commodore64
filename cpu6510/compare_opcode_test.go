@@ -9,7 +9,7 @@ func TestCMPImmediate(t *testing.T) {
 		cpu.ram[1] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPImmediate"))
+		cpu.execute(InstructionAsHex("CMPImmediate"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -30,7 +30,7 @@ func TestCMPImmediate(t *testing.T) {
 		cpu.ram[1] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPImmediate"))
+		cpu.execute(InstructionAsHex("CMPImmediate"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -51,7 +51,7 @@ func TestCMPImmediate(t *testing.T) {
 		cpu.ram[1] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPImmediate"))
+		cpu.execute(InstructionAsHex("CMPImmediate"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -76,7 +76,7 @@ func TestCMPAbsolute(t *testing.T) {
 		cpu.ram[0x1337] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsolute"))
+		cpu.execute(InstructionAsHex("CMPAbsolute"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -103,7 +103,7 @@ func TestCMPAbsolute(t *testing.T) {
 		cpu.ram[0x1337] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPAbsolute"))
+		cpu.execute(InstructionAsHex("CMPAbsolute"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -126,7 +126,7 @@ func TestCMPAbsolute(t *testing.T) {
 		cpu.ram[0x1337] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsolute"))
+		cpu.execute(InstructionAsHex("CMPAbsolute"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -152,7 +152,7 @@ func TestCMPAbsoluteY(t *testing.T) {
 		cpu.ram[0x1338] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteY"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteY"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -180,7 +180,7 @@ func TestCMPAbsoluteY(t *testing.T) {
 		cpu.ram[0x1338] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteY"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteY"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -204,7 +204,7 @@ func TestCMPAbsoluteY(t *testing.T) {
 		cpu.ram[0x1338] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteY"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteY"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -229,7 +229,7 @@ func TestCMPZeroPageX(t *testing.T) {
 		cpu.ram[0x14] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPZeroPageX"))
+		cpu.execute(InstructionAsHex("CMPZeroPageX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -252,7 +252,7 @@ func TestCMPZeroPageX(t *testing.T) {
 		cpu.ram[0x14] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPZeroPageX"))
+		cpu.execute(InstructionAsHex("CMPZeroPageX"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -275,7 +275,7 @@ func TestCMPZeroPageX(t *testing.T) {
 		cpu.ram[0x14] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPZeroPageX"))
+		cpu.execute(InstructionAsHex("CMPZeroPageX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -301,7 +301,7 @@ func TestCMPAbsoluteX(t *testing.T) {
 		cpu.ram[0x1338] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteX"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -329,7 +329,7 @@ func TestCMPAbsoluteX(t *testing.T) {
 		cpu.ram[0x1338] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteX"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteX"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -353,7 +353,7 @@ func TestCMPAbsoluteX(t *testing.T) {
 		cpu.ram[0x1338] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPAbsoluteX"))
+		cpu.execute(InstructionAsHex("CMPAbsoluteX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -377,7 +377,7 @@ func TestCMPZeroPage(t *testing.T) {
 		cpu.ram[0x13] = 0x01
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPZeroPage"))
+		cpu.execute(InstructionAsHex("CMPZeroPage"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -399,7 +399,7 @@ func TestCMPZeroPage(t *testing.T) {
 		cpu.ram[0x13] = 0x42
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPZeroPage"))
+		cpu.execute(InstructionAsHex("CMPZeroPage"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -421,7 +421,7 @@ func TestCMPZeroPage(t *testing.T) {
 		cpu.ram[0x13] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPZeroPage"))
+		cpu.execute(InstructionAsHex("CMPZeroPage"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -446,7 +446,7 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.ram[0x14] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -469,7 +469,7 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.ram[0x14] = 0x37
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -492,7 +492,7 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.ram[0x14] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -519,7 +519,7 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.ram[0x12] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -544,7 +544,7 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.ram[0x13] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -567,7 +567,7 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.ram[0x14] = 0x37
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(OpCodeAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -590,7 +590,7 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.ram[0x14] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -613,7 +613,7 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.ram[0x13] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")

@@ -31,7 +31,7 @@ func TestBRK(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 2
 
-	cpu.execute(OpCodeAsHex("BRK"))
+	cpu.execute(InstructionAsHex("BRK"))
 
 	if !cpu.statusRegister.interruptDisableFlag {
 		t.Errorf("Interrupt disable flag should be set")
@@ -53,7 +53,7 @@ func TestASLZeroPage(t *testing.T) {
 		cpu.ram[cpu.programCounter+1] = 0x03
 		cpu.ram[0x03] = 0x03
 
-		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
 
 		if cpu.ram[0x03] != 0x06 {
 			t.Errorf("Memory location should be shifted left")
@@ -74,7 +74,7 @@ func TestASLZeroPage(t *testing.T) {
 		cpu.ram[cpu.programCounter+1] = 0x03
 		cpu.ram[0x03] = 0x80
 
-		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
 
 		if cpu.ram[0x03] != 0x00 {
 			t.Errorf("Memory location should be shifted left")
@@ -94,7 +94,7 @@ func TestASLZeroPage(t *testing.T) {
 		cpu.ram[cpu.programCounter+1] = 0x03
 		cpu.ram[0x03] = 0x40
 
-		cpu.execute(OpCodeAsHex("ASLZeroPage"))
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
 
 		if cpu.ram[0x03] != 0x80 {
 			t.Errorf("Memory location should be shifted left")
@@ -116,7 +116,7 @@ func TestASLAccumulator(t *testing.T) {
 		expectedPC := cpu.programCounter + 1
 		cpu.accumulator = 0x03
 
-		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+		cpu.execute(InstructionAsHex("ASLAccumulator"))
 
 		if cpu.accumulator != 0x06 {
 			t.Errorf("Accumulator should be shifted left")
@@ -136,7 +136,7 @@ func TestASLAccumulator(t *testing.T) {
 		expectedPC := cpu.programCounter + 1
 		cpu.accumulator = 0x80
 
-		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+		cpu.execute(InstructionAsHex("ASLAccumulator"))
 
 		if cpu.accumulator != 0x00 {
 			t.Errorf("Accumulator should be shifted left")
@@ -156,7 +156,7 @@ func TestASLAccumulator(t *testing.T) {
 		expectedPC := cpu.programCounter + 1
 		cpu.accumulator = 0x40
 
-		cpu.execute(OpCodeAsHex("ASLAccumulator"))
+		cpu.execute(InstructionAsHex("ASLAccumulator"))
 
 		if cpu.accumulator != 0x80 {
 			t.Errorf("Accumulator should be shifted left")
@@ -184,7 +184,7 @@ func TestASLAbsolute(t *testing.T) {
 		cpu.ram[cpu.programCounter+2] = 0x02
 		cpu.ram[0x0201] = 0x03
 
-		cpu.execute(OpCodeAsHex("ASLAbsolute"))
+		cpu.execute(InstructionAsHex("ASLAbsolute"))
 		if cpu.ram[0x0201] != 0x06 {
 			t.Errorf("Memory location should be shifted left, expected 0x06, got %02x", cpu.ram[0x0201])
 		}
@@ -205,7 +205,7 @@ func TestASLAbsolute(t *testing.T) {
 		cpu.ram[cpu.programCounter+2] = 0x02
 		cpu.ram[0x0201] = 0x80
 
-		cpu.execute(OpCodeAsHex("ASLAbsolute"))
+		cpu.execute(InstructionAsHex("ASLAbsolute"))
 		if cpu.ram[0x0201] != 0x00 {
 			t.Errorf("Memory location should be shifted left, expected 0x00, got %02x", cpu.ram[0x0200])
 		}
@@ -226,7 +226,7 @@ func TestASLAbsolute(t *testing.T) {
 		cpu.ram[cpu.programCounter+2] = 0x02
 		cpu.ram[0x0201] = 0x40
 
-		cpu.execute(OpCodeAsHex("ASLAbsolute"))
+		cpu.execute(InstructionAsHex("ASLAbsolute"))
 		if cpu.ram[0x0201] != 0x80 {
 			t.Errorf("Memory location should be shifted left, expected 0x80, got %02x", cpu.ram[0x0200])
 		}
@@ -253,7 +253,7 @@ func TestASLZeroPageX(t *testing.T) {
 		cpu.xRegister = 0x01
 		cpu.ram[0x02] = 0x03
 
-		cpu.execute(OpCodeAsHex("ASLZeroPageX"))
+		cpu.execute(InstructionAsHex("ASLZeroPageX"))
 
 		if cpu.ram[0x02] != 0x06 {
 			t.Errorf("Memory location should be shifted left, expected 0x06, got %02x", cpu.ram[0x02])
@@ -275,7 +275,7 @@ func TestASLZeroPageX(t *testing.T) {
 		cpu.xRegister = 0x01
 		cpu.ram[0x02] = 0x80
 
-		cpu.execute(OpCodeAsHex("ASLZeroPageX"))
+		cpu.execute(InstructionAsHex("ASLZeroPageX"))
 
 		if cpu.ram[0x02] != 0x00 {
 			t.Errorf("Memory location should be shifted left, expected 0x00, got %02x", cpu.ram[0x02])
@@ -297,7 +297,7 @@ func TestASLZeroPageX(t *testing.T) {
 		cpu.xRegister = 0x01
 		cpu.ram[0x02] = 0x40
 
-		cpu.execute(OpCodeAsHex("ASLZeroPageX"))
+		cpu.execute(InstructionAsHex("ASLZeroPageX"))
 
 		if cpu.ram[0x02] != 0x80 {
 			t.Errorf("Memory location should be shifted left, expected 0x80, got %02x", cpu.ram[0x02])
@@ -327,7 +327,7 @@ func TestASLAbsoluteX(t *testing.T) {
 
 		cpu.ram[0x0202] = 0x03
 
-		cpu.execute(OpCodeAsHex("ASLAbsoluteX"))
+		cpu.execute(InstructionAsHex("ASLAbsoluteX"))
 		if cpu.ram[0x0202] != 0x06 {
 			t.Errorf("Memory location should be shifted left, expected 0x06, got %02x", cpu.ram[0x0202])
 		}
@@ -350,7 +350,7 @@ func TestASLAbsoluteX(t *testing.T) {
 
 		cpu.ram[0x0202] = 0x80
 
-		cpu.execute(OpCodeAsHex("ASLAbsoluteX"))
+		cpu.execute(InstructionAsHex("ASLAbsoluteX"))
 		if cpu.ram[0x0202] != 0x00 {
 			t.Errorf("Memory location should be shifted left, expected 0x00, got %02x", cpu.ram[0x0202])
 		}
@@ -373,7 +373,7 @@ func TestASLAbsoluteX(t *testing.T) {
 
 		cpu.ram[0x0202] = 0x40
 
-		cpu.execute(OpCodeAsHex("ASLAbsoluteX"))
+		cpu.execute(InstructionAsHex("ASLAbsoluteX"))
 
 		if cpu.ram[0x0202] != 0x80 {
 			t.Errorf("Memory location should be shifted left, expected 0x80, got %02x", cpu.ram[0x0202])
@@ -400,7 +400,7 @@ func TestRTS(t *testing.T) {
 		cpu.ram[0x01FF] = 0x00
 		cpu.stackPointer = 0xFD
 
-		cpu.execute(OpCodeAsHex("RTS"))
+		cpu.execute(InstructionAsHex("RTS"))
 
 		if cpu.programCounter != 0x0004 {
 			t.Errorf("Program counter should be set to the address on the stack")
@@ -412,7 +412,7 @@ func TestNOP(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OpCodeAsHex("NOP"))
+	cpu.execute(InstructionAsHex("NOP"))
 
 	if cpu.programCounter != expectedPC {
 		t.Errorf("Program counter should be incremented")

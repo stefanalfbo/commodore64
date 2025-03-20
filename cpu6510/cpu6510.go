@@ -21,7 +21,7 @@ type StatusRegister struct {
 	// (otherwise usually in binary mode).
 	decimalModeFlag bool // D
 	// Indicates that interrupt request has been triggered by an BRK
-	// opcode (not an IRQ).
+	// instruction (not an IRQ).
 	breakCommandFlag bool // B
 	// Cannot be changed, usually set to 1.
 	unusedFlag bool
@@ -173,8 +173,8 @@ func (c *CPU) writeMemory(address uint16, value byte) {
 
 // Execute executes the instruction.
 func (c *CPU) execute(instruction byte) {
-	if runOpCode, ok := lookupOpCode[instruction]; ok {
-		runOpCode(c)
+	if runInstruction, ok := lookupInstruction[instruction]; ok {
+		runInstruction(c)
 	} else {
 		panic(fmt.Sprintf("Unknown instruction, %x", instruction))
 	}

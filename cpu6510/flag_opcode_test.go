@@ -7,7 +7,7 @@ func TestCLC(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.carryFlag = true
 
-	cpu.execute(OpCodeAsHex("CLC"))
+	cpu.execute(InstructionAsHex("CLC"))
 
 	if cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be cleared")
@@ -23,7 +23,7 @@ func TestCLD(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.decimalModeFlag = true
 
-	cpu.execute(OpCodeAsHex("CLD"))
+	cpu.execute(InstructionAsHex("CLD"))
 
 	if cpu.statusRegister.decimalModeFlag {
 		t.Errorf("Decimal mode flag should be cleared")
@@ -38,7 +38,7 @@ func TestSEC(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OpCodeAsHex("SEC"))
+	cpu.execute(InstructionAsHex("SEC"))
 
 	if !cpu.statusRegister.carryFlag {
 		t.Errorf("Carry flag should be set")
@@ -53,7 +53,7 @@ func TestSED(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OpCodeAsHex("SED"))
+	cpu.execute(InstructionAsHex("SED"))
 
 	if !cpu.statusRegister.decimalModeFlag {
 		t.Errorf("Decimal mode flag should be set")
@@ -69,7 +69,7 @@ func TestCLI(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.interruptDisableFlag = true
 
-	cpu.execute(OpCodeAsHex("CLI"))
+	cpu.execute(InstructionAsHex("CLI"))
 
 	if cpu.statusRegister.interruptDisableFlag {
 		t.Errorf("Interrupt disable flag should be cleared")
@@ -85,7 +85,7 @@ func TestCLV(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.statusRegister.overflowFlag = true
 
-	cpu.execute(OpCodeAsHex("CLV"))
+	cpu.execute(InstructionAsHex("CLV"))
 
 	if cpu.statusRegister.overflowFlag {
 		t.Errorf("Overflow flag should be cleared")
@@ -100,7 +100,7 @@ func TestSEI(t *testing.T) {
 	cpu := NewCPU()
 	expectedPC := cpu.programCounter + 1
 
-	cpu.execute(OpCodeAsHex("SEI"))
+	cpu.execute(InstructionAsHex("SEI"))
 
 	if !cpu.statusRegister.interruptDisableFlag {
 		t.Errorf("Interrupt disable flag should be set")

@@ -7,7 +7,7 @@ func TestTAX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x03
 
-		cpu.execute(OpCodeAsHex("TAX"))
+		cpu.execute(InstructionAsHex("TAX"))
 
 		if cpu.xRegister != 0x03 {
 			t.Errorf("X register should be set to the value of the accumulator")
@@ -26,7 +26,7 @@ func TestTAX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x00
 
-		cpu.execute(OpCodeAsHex("TAX"))
+		cpu.execute(InstructionAsHex("TAX"))
 
 		if cpu.xRegister != 0x00 {
 			t.Errorf("X register should be set to the value of the accumulator")
@@ -45,7 +45,7 @@ func TestTAX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x80
 
-		cpu.execute(OpCodeAsHex("TAX"))
+		cpu.execute(InstructionAsHex("TAX"))
 
 		if cpu.xRegister != 0x80 {
 			t.Errorf("X register should be set to the value of the accumulator")
@@ -66,7 +66,7 @@ func TestTAY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x03
 
-		cpu.execute(OpCodeAsHex("TAY"))
+		cpu.execute(InstructionAsHex("TAY"))
 
 		if cpu.yRegister != 0x03 {
 			t.Errorf("Y register should be set to the value of the accumulator")
@@ -85,7 +85,7 @@ func TestTAY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x00
 
-		cpu.execute(OpCodeAsHex("TAY"))
+		cpu.execute(InstructionAsHex("TAY"))
 
 		if cpu.yRegister != 0x00 {
 			t.Errorf("Y register should be set to the value of the accumulator")
@@ -104,7 +104,7 @@ func TestTAY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x80
 
-		cpu.execute(OpCodeAsHex("TAY"))
+		cpu.execute(InstructionAsHex("TAY"))
 
 		if cpu.yRegister != 0x80 {
 			t.Errorf("Y register should be set to the value of the accumulator")
@@ -125,7 +125,7 @@ func TestTXA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x03
 
-		cpu.execute(OpCodeAsHex("TXA"))
+		cpu.execute(InstructionAsHex("TXA"))
 
 		if cpu.accumulator != cpu.xRegister {
 			t.Errorf("Accumulator should be set to the value of the X register")
@@ -144,7 +144,7 @@ func TestTXA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x00
 
-		cpu.execute(OpCodeAsHex("TXA"))
+		cpu.execute(InstructionAsHex("TXA"))
 
 		if cpu.accumulator != cpu.xRegister {
 			t.Errorf("Accumulator should be set to the value of the X register")
@@ -163,7 +163,7 @@ func TestTXA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x80
 
-		cpu.execute(OpCodeAsHex("TXA"))
+		cpu.execute(InstructionAsHex("TXA"))
 
 		if cpu.accumulator != cpu.xRegister {
 			t.Errorf("Accumulator should be set to the value of the X register")
@@ -184,7 +184,7 @@ func TestTYA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x03
 
-		cpu.execute(OpCodeAsHex("TYA"))
+		cpu.execute(InstructionAsHex("TYA"))
 
 		if cpu.accumulator != cpu.yRegister {
 			t.Errorf("Accumulator should be set to the value of the Y register")
@@ -203,7 +203,7 @@ func TestTYA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x00
 
-		cpu.execute(OpCodeAsHex("TYA"))
+		cpu.execute(InstructionAsHex("TYA"))
 
 		if cpu.accumulator != cpu.yRegister {
 			t.Errorf("Accumulator should be set to the value of the Y register")
@@ -222,7 +222,7 @@ func TestTYA(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x80
 
-		cpu.execute(OpCodeAsHex("TYA"))
+		cpu.execute(InstructionAsHex("TYA"))
 
 		if cpu.accumulator != cpu.yRegister {
 			t.Errorf("Accumulator should be set to the value of the Y register")
@@ -243,7 +243,7 @@ func TestDEX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x03
 
-		cpu.execute(OpCodeAsHex("DEX"))
+		cpu.execute(InstructionAsHex("DEX"))
 
 		if cpu.xRegister != 0x02 {
 			t.Errorf("X register should be decremented")
@@ -262,7 +262,7 @@ func TestDEX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x01
 
-		cpu.execute(OpCodeAsHex("DEX"))
+		cpu.execute(InstructionAsHex("DEX"))
 
 		if cpu.xRegister != 0x00 {
 			t.Errorf("X register should be decremented")
@@ -281,7 +281,7 @@ func TestDEX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x00
 
-		cpu.execute(OpCodeAsHex("DEX"))
+		cpu.execute(InstructionAsHex("DEX"))
 
 		if cpu.xRegister != 0xFF {
 			t.Errorf("X register should be decremented")
@@ -302,7 +302,7 @@ func TestDEY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x03
 
-		cpu.execute(OpCodeAsHex("DEY"))
+		cpu.execute(InstructionAsHex("DEY"))
 
 		if cpu.yRegister != 0x02 {
 			t.Errorf("Y register should be decremented")
@@ -321,7 +321,7 @@ func TestDEY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x01
 
-		cpu.execute(OpCodeAsHex("DEY"))
+		cpu.execute(InstructionAsHex("DEY"))
 
 		if cpu.yRegister != 0x00 {
 			t.Errorf("Y register should be decremented")
@@ -340,7 +340,7 @@ func TestDEY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x00
 
-		cpu.execute(OpCodeAsHex("DEY"))
+		cpu.execute(InstructionAsHex("DEY"))
 
 		if cpu.yRegister != 0xFF {
 			t.Errorf("Y register should be decremented")
@@ -360,7 +360,7 @@ func TestINX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x01
 
-		cpu.execute(OpCodeAsHex("INX"))
+		cpu.execute(InstructionAsHex("INX"))
 
 		if cpu.xRegister != 0x02 {
 			t.Errorf("X register should be incremented")
@@ -379,7 +379,7 @@ func TestINX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0xFF
 
-		cpu.execute(OpCodeAsHex("INX"))
+		cpu.execute(InstructionAsHex("INX"))
 
 		if cpu.xRegister != 0x00 {
 			t.Errorf("X register should be incremented")
@@ -398,7 +398,7 @@ func TestINX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.xRegister = 0x7F
 
-		cpu.execute(OpCodeAsHex("INX"))
+		cpu.execute(InstructionAsHex("INX"))
 
 		if cpu.xRegister != 0x80 {
 			t.Errorf("X register should be incremented")
@@ -419,7 +419,7 @@ func TestINY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x01
 
-		cpu.execute(OpCodeAsHex("INY"))
+		cpu.execute(InstructionAsHex("INY"))
 
 		if cpu.yRegister != 0x02 {
 			t.Errorf("X register should be incremented")
@@ -438,7 +438,7 @@ func TestINY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0xFF
 
-		cpu.execute(OpCodeAsHex("INY"))
+		cpu.execute(InstructionAsHex("INY"))
 
 		if cpu.yRegister != 0x00 {
 			t.Errorf("Y register should be incremented")
@@ -457,7 +457,7 @@ func TestINY(t *testing.T) {
 		cpu := NewCPU()
 		cpu.yRegister = 0x7F
 
-		cpu.execute(OpCodeAsHex("INY"))
+		cpu.execute(InstructionAsHex("INY"))
 
 		if cpu.yRegister != 0x80 {
 			t.Errorf("Y register should be incremented")

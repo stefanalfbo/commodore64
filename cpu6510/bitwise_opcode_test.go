@@ -10,7 +10,7 @@ func TestORAIndexedIndirectX(t *testing.T) {
 		cpu.ram[1] = 0x13
 		cpu.ram[0x14] = 0b10101010
 
-		cpu.execute(OpCodeAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
 
 		if cpu.accumulator != 0b11111111 {
 			t.Errorf("Accumulator should be 0b11111111")
@@ -24,7 +24,7 @@ func TestORAIndexedIndirectX(t *testing.T) {
 		cpu.ram[1] = 0x13
 		cpu.ram[0x14] = 0b10000000
 
-		cpu.execute(OpCodeAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
 
 		if cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be cleared")
@@ -43,7 +43,7 @@ func TestORAIndexedIndirectX(t *testing.T) {
 		cpu.ram[0x14] = 0x00
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(OpCodeAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
 
 		if !cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be set")

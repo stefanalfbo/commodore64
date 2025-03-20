@@ -7,7 +7,7 @@ func TestPHA(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.accumulator = 0x03
 
-	cpu.execute(OpCodeAsHex("PHA"))
+	cpu.execute(InstructionAsHex("PHA"))
 
 	if cpu.ram[0x01FF] != cpu.accumulator {
 		t.Errorf("Accumulator should be pushed onto the stack")
@@ -29,7 +29,7 @@ func TestPLA(t *testing.T) {
 		cpu.ram[0x01FF] = 0x03
 		cpu.stackPointer = 0xFE
 
-		cpu.execute(OpCodeAsHex("PLA"))
+		cpu.execute(InstructionAsHex("PLA"))
 
 		if cpu.accumulator != cpu.ram[0x01FF] {
 			t.Errorf("Accumulator should be set to the value on the stack")
@@ -50,7 +50,7 @@ func TestPLA(t *testing.T) {
 		cpu.ram[0x01FF] = 0x00
 		cpu.stackPointer = 0xFE
 
-		cpu.execute(OpCodeAsHex("PLA"))
+		cpu.execute(InstructionAsHex("PLA"))
 
 		if cpu.accumulator != cpu.ram[0x01FF] {
 			t.Errorf("Accumulator should be set to the value on the stack")
@@ -75,7 +75,7 @@ func TestPLA(t *testing.T) {
 		cpu.ram[0x01FF] = 0x80
 		cpu.stackPointer = 0xFE
 
-		cpu.execute(OpCodeAsHex("PLA"))
+		cpu.execute(InstructionAsHex("PLA"))
 
 		if cpu.accumulator != cpu.ram[0x01FF] {
 			t.Errorf("Accumulator should be set to the value on the stack")
@@ -111,7 +111,7 @@ func TestPHP(t *testing.T) {
 		cpu.statusRegister.overflowFlag = true
 		cpu.statusRegister.negativeFlag = true
 
-		cpu.execute(OpCodeAsHex("PHP"))
+		cpu.execute(InstructionAsHex("PHP"))
 
 		if cpu.ram[0x01FF] != 0xFF {
 			t.Errorf("Status register should be pushed onto the stack")
@@ -130,7 +130,7 @@ func TestPHP(t *testing.T) {
 		cpu := NewCPU()
 		expectedPC := cpu.programCounter + 1
 
-		cpu.execute(OpCodeAsHex("PHP"))
+		cpu.execute(InstructionAsHex("PHP"))
 
 		if cpu.ram[0x01FF] != 0x20 {
 			t.Errorf("Status register should be pushed onto the stack")
@@ -153,7 +153,7 @@ func TestPLP(t *testing.T) {
 		cpu.ram[0x01FF] = 0x20
 		cpu.stackPointer = 0xFE
 
-		cpu.execute(OpCodeAsHex("PLP"))
+		cpu.execute(InstructionAsHex("PLP"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -198,7 +198,7 @@ func TestPLP(t *testing.T) {
 		cpu.ram[0x01FF] = 0xFF
 		cpu.stackPointer = 0xFE
 
-		cpu.execute(OpCodeAsHex("PLP"))
+		cpu.execute(InstructionAsHex("PLP"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -245,7 +245,7 @@ func TestTSX(t *testing.T) {
 		expectedPC := cpu.programCounter + 1
 		cpu.stackPointer = 0x03
 
-		cpu.execute(OpCodeAsHex("TSX"))
+		cpu.execute(InstructionAsHex("TSX"))
 
 		if cpu.xRegister != cpu.stackPointer {
 			t.Errorf("X register should be set to the value of the stack pointer")
@@ -260,7 +260,7 @@ func TestTSX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.stackPointer = 0x00
 
-		cpu.execute(OpCodeAsHex("TSX"))
+		cpu.execute(InstructionAsHex("TSX"))
 
 		if cpu.xRegister != cpu.stackPointer {
 			t.Errorf("X register should be set to the value of the stack pointer")
@@ -279,7 +279,7 @@ func TestTSX(t *testing.T) {
 		cpu := NewCPU()
 		cpu.stackPointer = 0x80
 
-		cpu.execute(OpCodeAsHex("TSX"))
+		cpu.execute(InstructionAsHex("TSX"))
 
 		if cpu.xRegister != cpu.stackPointer {
 			t.Errorf("X register should be set to the value of the stack pointer")
@@ -300,7 +300,7 @@ func TestTXS(t *testing.T) {
 	expectedPC := cpu.programCounter + 1
 	cpu.xRegister = 0x03
 
-	cpu.execute(OpCodeAsHex("TXS"))
+	cpu.execute(InstructionAsHex("TXS"))
 
 	if cpu.stackPointer != cpu.xRegister {
 		t.Errorf("Stack pointer should be set to the value of the X register")

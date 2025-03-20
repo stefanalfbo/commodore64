@@ -2,9 +2,9 @@ package cpu6510
 
 import "fmt"
 
-type OpCodeFunc func(*CPU)
+type InstructionFunc func(*CPU)
 
-var lookupOpCode = map[byte]OpCodeFunc{
+var lookupInstruction = map[byte]InstructionFunc{
 	0x00: BRK,
 	0x01: ORAIndexedIndirectX,
 	0x06: ASLZeroPage,
@@ -45,16 +45,16 @@ var lookupOpCode = map[byte]OpCodeFunc{
 	0xF8: SED,
 }
 
-func OpCodeAsHex(name string) byte {
-	opCode, ok := opCodes[name]
+func InstructionAsHex(name string) byte {
+	instruction, ok := instructions[name]
 	if !ok {
-		panic(fmt.Sprintf("Unknown op code, %s", name))
+		panic(fmt.Sprintf("Unknown instruction, %s", name))
 	}
 
-	return opCode
+	return instruction
 }
 
-var opCodes = map[string]byte{
+var instructions = map[string]byte{
 	"BRK":                 0x00,
 	"ORAIndexedIndirectX": 0x01,
 	"ASLZeroPage":         0x06,
