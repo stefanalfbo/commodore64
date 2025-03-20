@@ -6,6 +6,7 @@ type OpCodeFunc func(*CPU)
 
 var lookupOpCode = map[byte]OpCodeFunc{
 	0x00: BRK,
+	0x01: ORAIndexedIndirectX,
 	0x06: ASLZeroPage,
 	0x0A: ASLAccumulator,
 	0x0E: ASLAbsolute,
@@ -55,6 +56,7 @@ func OpCodeAsHex(name string) byte {
 
 var opCodes = map[string]byte{
 	"BRK":                 0x00,
+	"ORAIndexedIndirectX": 0x01,
 	"ASLZeroPage":         0x06,
 	"ASLAccumulator":      0x0A,
 	"ASLAbsolute":         0x0E,
@@ -125,6 +127,23 @@ func BRK(c *CPU) {
 
 	// BRK increments the program counter by 2 instead of 1
 	c.programCounter += 2
+}
+
+// ORAIndexedIndirectX - OR with Accumulator. ORA performs a logical OR
+// between the value in the accumulator and the value in memory, and stores
+// the result in the accumulator.
+func ORAIndexedIndirectX(c *CPU) {
+	c.programCounter++
+
+	address := uint8(c.ram[c.programCounter] + c.xRegister)
+
+	value := c.readMemory(uint16(address))
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
