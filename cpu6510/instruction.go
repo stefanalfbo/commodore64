@@ -7,6 +7,7 @@ type InstructionFunc func(*CPU)
 var lookupInstruction = map[byte]InstructionFunc{
 	0x00: BRK,
 	0x01: ORAIndexedIndirectX,
+	0x05: ORAZeroPage,
 	0x06: ASLZeroPage,
 	0x09: ORAImmediate,
 	0x0A: ASLAccumulator,
@@ -61,6 +62,7 @@ func InstructionAsHex(name string) byte {
 var instructions = map[string]byte{
 	"BRK":                 0x00,
 	"ORAIndexedIndirectX": 0x01,
+	"ORAZeroPage":         0x05,
 	"ASLZeroPage":         0x06,
 	"ORAImmediate":        0x09,
 	"ASLAccumulator":      0x0A,
@@ -201,6 +203,23 @@ func ORAAbsoluteY(c *CPU) {
 	raiseStatusRegisterFlags(c, c.accumulator)
 
 	c.programCounter += 2
+}
+
+// ORAZeroPage - OR with Accumulator. ORA performs a logical OR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ORAZeroPage(c *CPU) {
+	c.programCounter++
+
+	address := uint16(c.ram[c.programCounter])
+
+	value := c.readMemory(address)
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
 }
 
 // ORAIndexedIndirectX - OR with Accumulator. ORA performs a logical OR
