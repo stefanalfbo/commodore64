@@ -317,15 +317,17 @@ func TestORAZeroPageX(t *testing.T) {
 	})
 }
 
-func TestORAIndexedIndirectX(t *testing.T) {
+func TestORAIndexedIndirect(t *testing.T) {
 	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0b01010101
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
+		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0b10101010
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
 
 		if cpu.accumulator != 0b11111111 {
 			t.Errorf("Accumulator should be 0b11111111")
@@ -337,9 +339,11 @@ func TestORAIndexedIndirectX(t *testing.T) {
 		cpu.accumulator = 0b00000001
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10000000
+		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0b10000000
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
 
 		if cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be cleared")
@@ -355,10 +359,12 @@ func TestORAIndexedIndirectX(t *testing.T) {
 		cpu.accumulator = 0x00
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x00
+		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0x00
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
 
 		if !cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be set")
@@ -370,15 +376,17 @@ func TestORAIndexedIndirectX(t *testing.T) {
 	})
 }
 
-func TestORAIndexedIndirectY(t *testing.T) {
+func TestORAIndirectIndexed(t *testing.T) {
 	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0b01010101
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
+		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0b10101010
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectY"))
+		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
 
 		if cpu.accumulator != 0b11111111 {
 			t.Errorf("Accumulator should be 0b11111111")
@@ -390,9 +398,11 @@ func TestORAIndexedIndirectY(t *testing.T) {
 		cpu.accumulator = 0b00000001
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10000000
+		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0b10000000
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectY"))
+		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
 
 		if cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be cleared")
@@ -408,10 +418,12 @@ func TestORAIndexedIndirectY(t *testing.T) {
 		cpu.accumulator = 0x00
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x00
+		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0x00
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirectY"))
+		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
 
 		if !cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be set")

@@ -6,7 +6,7 @@ type InstructionFunc func(*CPU)
 
 var lookupInstruction = map[byte]InstructionFunc{
 	0x00: BRK,
-	0x01: ORAIndexedIndirectX,
+	0x01: ORAIndexedIndirect,
 	0x05: ORAZeroPage,
 	0x06: ASLZeroPage,
 	0x08: PHP,
@@ -14,7 +14,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x0A: ASLAccumulator,
 	0x0D: ORAAbsolute,
 	0x0E: ASLAbsolute,
-	0x11: ORAIndexedIndirectY,
+	0x11: ORAIndirectIndexed,
 	0x15: ORAZeroPageX,
 	0x16: ASLZeroPageX,
 	0x18: CLC,
@@ -63,7 +63,7 @@ func InstructionAsHex(name string) byte {
 
 var instructions = map[string]byte{
 	"BRK":                 0x00,
-	"ORAIndexedIndirectX": 0x01,
+	"ORAIndexedIndirect":  0x01,
 	"ORAZeroPage":         0x05,
 	"ASLZeroPage":         0x06,
 	"PHP":                 0x08,
@@ -71,7 +71,7 @@ var instructions = map[string]byte{
 	"ASLAccumulator":      0x0A,
 	"ORAAbsolute":         0x0D,
 	"ASLAbsolute":         0x0E,
-	"ORAIndexedIndirectY": 0x11,
+	"ORAIndirectIndexed":  0x11,
 	"ORAZeroPageX":        0x15,
 	"ASLZeroPageX":        0x16,
 	"CLC":                 0x18,
@@ -143,19 +143,24 @@ func BRK(c *CPU) {
 	c.programCounter += 2
 }
 
+// ORA - OR with Accumulator. ORA performs a logical OR between the value in
+// the accumulator and the given value, and stores the result in the
+// accumulator.
+func ora(c *CPU, value byte) {
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+}
+
 // ORAImmediate - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAImmediate(c *CPU) {
 	c.programCounter++
 
-	value := c.ram[c.programCounter]
+	value := c.getValueByImmediateAddressingMode()
 
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter++
+	ora(c, value)
 }
 
 // ORAAbsolute - OR with Accumulator. ORA performs a logical OR between the
@@ -164,15 +169,9 @@ func ORAImmediate(c *CPU) {
 func ORAAbsolute(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory()
+	value := c.getValueByAbsoluteAddressingMode()
 
-	value := c.readMemory(address)
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter += 2
+	ora(c, value)
 }
 
 // ORAAbsoluteX - OR with Accumulator. ORA performs a logical OR between the
@@ -181,15 +180,9 @@ func ORAAbsolute(c *CPU) {
 func ORAAbsoluteX(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory() + uint16(c.xRegister)
+	value := c.getValueByAbsoluteXAddressingMode()
 
-	value := c.readMemory(address)
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter += 2
+	ora(c, value)
 }
 
 // ORAAbsoluteY - OR with Accumulator. ORA performs a logical OR between the
@@ -198,15 +191,9 @@ func ORAAbsoluteX(c *CPU) {
 func ORAAbsoluteY(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory() + uint16(c.yRegister)
+	value := c.getValueByAbsoluteYAddressingMode()
 
-	value := c.readMemory(address)
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter += 2
+	ora(c, value)
 }
 
 // ORAZeroPage - OR with Accumulator. ORA performs a logical OR between the
@@ -215,15 +202,9 @@ func ORAAbsoluteY(c *CPU) {
 func ORAZeroPage(c *CPU) {
 	c.programCounter++
 
-	address := uint16(c.ram[c.programCounter])
+	value := c.getValueByZeroPageAddressingMode()
 
-	value := c.readMemory(address)
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter++
+	ora(c, value)
 }
 
 // ORAZeroPageX - OR with Accumulator. ORA performs a logical OR between the
@@ -232,49 +213,31 @@ func ORAZeroPage(c *CPU) {
 func ORAZeroPageX(c *CPU) {
 	c.programCounter++
 
-	address := uint16(c.ram[c.programCounter] + c.xRegister)
+	value := c.getValueByZeroPageXAddressingMode()
 
-	value := c.readMemory(address)
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter++
+	ora(c, value)
 }
 
-// ORAIndexedIndirectX - OR with Accumulator. ORA performs a logical OR
+// ORAIndexedIndirect - OR with Accumulator. ORA performs a logical OR
 // between the value in the accumulator and the value in memory, and stores
 // the result in the accumulator.
-func ORAIndexedIndirectX(c *CPU) {
+func ORAIndexedIndirect(c *CPU) {
 	c.programCounter++
 
-	address := uint8(c.ram[c.programCounter] + c.xRegister)
+	value := c.getValueByIndexedIndirectAddressingMode()
 
-	value := c.readMemory(uint16(address))
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter++
+	ora(c, value)
 }
 
-// ORAIndexedIndirectY - OR with Accumulator. ORA performs a logical OR
+// ORAIndirectIndexed - OR with Accumulator. ORA performs a logical OR
 // between the value in the accumulator and the value in memory, and stores
 // the result in the accumulator.
-func ORAIndexedIndirectY(c *CPU) {
+func ORAIndirectIndexed(c *CPU) {
 	c.programCounter++
 
-	address := uint8(c.ram[c.programCounter]) + c.yRegister
+	value := c.getValueByIndirectIndexedAddressingMode()
 
-	value := c.readMemory(uint16(address))
-
-	c.accumulator |= value
-
-	raiseStatusRegisterFlags(c, c.accumulator)
-
-	c.programCounter++
+	ora(c, value)
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
@@ -559,7 +522,7 @@ func cmp(c *CPU, value byte) {
 func CMPImmediate(c *CPU) {
 	c.programCounter++
 
-	value := c.ram[c.programCounter]
+	value := c.getValueByImmediateAddressingMode()
 
 	cmp(c, value)
 }
@@ -570,13 +533,9 @@ func CMPImmediate(c *CPU) {
 func CMPAbsolute(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory()
-
-	value := c.readMemory(address)
+	value := c.getValueByAbsoluteAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter += 2
 }
 
 // CMPZeroPageX - CoMPare. CMP compares the value in the accumulator with the
@@ -585,13 +544,9 @@ func CMPAbsolute(c *CPU) {
 func CMPZeroPageX(c *CPU) {
 	c.programCounter++
 
-	address := uint16(c.ram[c.programCounter] + c.xRegister)
-
-	value := c.readMemory(address)
+	value := c.getValueByZeroPageXAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter++
 }
 
 // CMPAbsoluteY - CoMPare. CMP compares the value in the accumulator with the
@@ -600,13 +555,9 @@ func CMPZeroPageX(c *CPU) {
 func CMPAbsoluteY(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory() + uint16(c.yRegister)
-
-	value := c.readMemory(address)
+	value := c.getValueByAbsoluteYAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter += 2
 }
 
 // CMPAbsoluteX - CoMPare. CMP compares the value in the accumulator with the
@@ -615,13 +566,9 @@ func CMPAbsoluteY(c *CPU) {
 func CMPAbsoluteX(c *CPU) {
 	c.programCounter++
 
-	address := c.readAddressFromMemory() + uint16(c.xRegister)
-
-	value := c.readMemory(address)
+	value := c.getValueByAbsoluteXAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter += 2
 }
 
 // CMPIndexedIndirectX - CoMPare. CMP compares the value in the accumulator with
@@ -660,13 +607,9 @@ func CMPIndirectIndexedY(c *CPU) {
 func CMPZeroPage(c *CPU) {
 	c.programCounter++
 
-	address := uint16(c.ram[c.programCounter])
-
-	value := c.readMemory(address)
+	value := c.getValueByZeroPageAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter++
 }
 
 // CLD - CLear Decimal flag
