@@ -8,6 +8,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x00: BRK,
 	0x01: ORAIndexedIndirectX,
 	0x06: ASLZeroPage,
+	0x09: ORAImmediate,
 	0x0A: ASLAccumulator,
 	0x0E: ASLAbsolute,
 	0x08: PHP,
@@ -58,6 +59,7 @@ var instructions = map[string]byte{
 	"BRK":                 0x00,
 	"ORAIndexedIndirectX": 0x01,
 	"ASLZeroPage":         0x06,
+	"ORAImmediate":        0x09,
 	"ASLAccumulator":      0x0A,
 	"ASLAbsolute":         0x0E,
 	"PHP":                 0x08,
@@ -127,6 +129,21 @@ func BRK(c *CPU) {
 
 	// BRK increments the program counter by 2 instead of 1
 	c.programCounter += 2
+}
+
+// ORAImmediate - OR with Accumulator. ORA performs a logical OR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ORAImmediate(c *CPU) {
+	c.programCounter++
+
+	value := c.ram[c.programCounter]
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
 }
 
 // ORAIndexedIndirectX - OR with Accumulator. ORA performs a logical OR
