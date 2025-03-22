@@ -15,6 +15,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x08: PHP,
 	0x16: ASLZeroPageX,
 	0x18: CLC,
+	0x19: ORAAbsoluteY,
 	0x1D: ORAAbsoluteX,
 	0x1E: ASLAbsoluteX,
 	0x28: PLP,
@@ -68,6 +69,7 @@ var instructions = map[string]byte{
 	"PHP":                 0x08,
 	"ASLZeroPageX":        0x16,
 	"CLC":                 0x18,
+	"ORAAbsoluteY":        0x19,
 	"ORAAbsoluteX":        0x1D,
 	"ASLAbsoluteX":        0x1E,
 	"PLP":                 0x28,
@@ -174,6 +176,23 @@ func ORAAbsoluteX(c *CPU) {
 	c.programCounter++
 
 	address := c.readAddressFromMemory() + uint16(c.xRegister)
+
+	value := c.readMemory(address)
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter += 2
+}
+
+// ORAAbsoluteY - OR with Accumulator. ORA performs a logical OR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ORAAbsoluteY(c *CPU) {
+	c.programCounter++
+
+	address := c.readAddressFromMemory() + uint16(c.yRegister)
 
 	value := c.readMemory(address)
 
