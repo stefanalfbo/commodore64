@@ -14,6 +14,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x0A: ASLAccumulator,
 	0x0D: ORAAbsolute,
 	0x0E: ASLAbsolute,
+	0x11: ORAIndexedIndirectY,
 	0x15: ORAZeroPageX,
 	0x16: ASLZeroPageX,
 	0x18: CLC,
@@ -70,6 +71,7 @@ var instructions = map[string]byte{
 	"ASLAccumulator":      0x0A,
 	"ORAAbsolute":         0x0D,
 	"ASLAbsolute":         0x0E,
+	"ORAIndexedIndirectY": 0x11,
 	"ORAZeroPageX":        0x15,
 	"ASLZeroPageX":        0x16,
 	"CLC":                 0x18,
@@ -248,6 +250,23 @@ func ORAIndexedIndirectX(c *CPU) {
 	c.programCounter++
 
 	address := uint8(c.ram[c.programCounter] + c.xRegister)
+
+	value := c.readMemory(uint16(address))
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
+}
+
+// ORAIndexedIndirectY - OR with Accumulator. ORA performs a logical OR
+// between the value in the accumulator and the value in memory, and stores
+// the result in the accumulator.
+func ORAIndexedIndirectY(c *CPU) {
+	c.programCounter++
+
+	address := uint8(c.ram[c.programCounter]) + c.yRegister
 
 	value := c.readMemory(uint16(address))
 
