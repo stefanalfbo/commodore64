@@ -146,7 +146,11 @@ func BRK(c *CPU) {
 // ORA - OR with Accumulator. ORA performs a logical OR between the value in
 // the accumulator and the given value, and stores the result in the
 // accumulator.
-func ora(c *CPU, value byte) {
+func ora(c *CPU, getValue func() byte) {
+	c.programCounter++
+
+	value := getValue()
+
 	c.accumulator |= value
 
 	raiseStatusRegisterFlags(c, c.accumulator)
@@ -156,88 +160,56 @@ func ora(c *CPU, value byte) {
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAImmediate(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByImmediateAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByImmediateAddressingMode)
 }
 
 // ORAAbsolute - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAAbsolute(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByAbsoluteAddressingMode)
 }
 
 // ORAAbsoluteX - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAAbsoluteX(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteXAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByAbsoluteXAddressingMode)
 }
 
 // ORAAbsoluteY - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAAbsoluteY(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteYAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByAbsoluteYAddressingMode)
 }
 
 // ORAZeroPage - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAZeroPage(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByZeroPageAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByZeroPageAddressingMode)
 }
 
 // ORAZeroPageX - OR with Accumulator. ORA performs a logical OR between the
 // value in the accumulator and the value in memory, and stores the result in
 // the accumulator.
 func ORAZeroPageX(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByZeroPageXAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByZeroPageXAddressingMode)
 }
 
 // ORAIndexedIndirect - OR with Accumulator. ORA performs a logical OR
 // between the value in the accumulator and the value in memory, and stores
 // the result in the accumulator.
 func ORAIndexedIndirect(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByIndexedIndirectAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByIndexedIndirectAddressingMode)
 }
 
 // ORAIndirectIndexed - OR with Accumulator. ORA performs a logical OR
 // between the value in the accumulator and the value in memory, and stores
 // the result in the accumulator.
 func ORAIndirectIndexed(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByIndirectIndexedAddressingMode()
-
-	ora(c, value)
+	ora(c, c.getValueByIndirectIndexedAddressingMode)
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
@@ -508,7 +480,11 @@ func DEX(c *CPU) {
 	c.programCounter++
 }
 
-func cmp(c *CPU, value byte) {
+func cmp(c *CPU, getValue func() byte) {
+	c.programCounter++
+
+	value := getValue()
+
 	tmp := c.accumulator - value
 
 	raiseStatusRegisterFlags(c, tmp)
@@ -520,77 +496,49 @@ func cmp(c *CPU, value byte) {
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPImmediate(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByImmediateAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByImmediateAddressingMode)
 }
 
 // CMPAbsolute - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPAbsolute(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByAbsoluteAddressingMode)
 }
 
 // CMPZeroPageX - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPZeroPageX(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByZeroPageXAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByZeroPageXAddressingMode)
 }
 
 // CMPAbsoluteY - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPAbsoluteY(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteYAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByAbsoluteYAddressingMode)
 }
 
 // CMPAbsoluteX - CoMPare. CMP compares the value in the accumulator with the
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPAbsoluteX(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByAbsoluteXAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByAbsoluteXAddressingMode)
 }
 
 // CMPIndexedIndirect - CoMPare. CMP compares the value in the accumulator with
 // the value in memory, and sets the zero and negative flags in the status
 // register based on the result.
 func CMPIndexedIndirect(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByIndexedIndirectAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByIndexedIndirectAddressingMode)
 }
 
 // CMPIndirectIndexed - CoMPare. CMP compares the value in the accumulator with
 // the value in memory, and sets the zero and negative flags in the status
 // register based on the result.
 func CMPIndirectIndexed(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByIndirectIndexedAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByIndirectIndexedAddressingMode)
 
 	c.programCounter++
 }
@@ -599,11 +547,7 @@ func CMPIndirectIndexed(c *CPU) {
 // value in memory, and sets the zero and negative flags in the status register
 // based on the result.
 func CMPZeroPage(c *CPU) {
-	c.programCounter++
-
-	value := c.getValueByZeroPageAddressingMode()
-
-	cmp(c, value)
+	cmp(c, c.getValueByZeroPageAddressingMode)
 }
 
 // CLD - CLear Decimal flag
