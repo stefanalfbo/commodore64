@@ -9,11 +9,12 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x01: ORAIndexedIndirectX,
 	0x05: ORAZeroPage,
 	0x06: ASLZeroPage,
+	0x08: PHP,
 	0x09: ORAImmediate,
 	0x0A: ASLAccumulator,
 	0x0D: ORAAbsolute,
 	0x0E: ASLAbsolute,
-	0x08: PHP,
+	0x15: ORAZeroPageX,
 	0x16: ASLZeroPageX,
 	0x18: CLC,
 	0x19: ORAAbsoluteY,
@@ -64,11 +65,12 @@ var instructions = map[string]byte{
 	"ORAIndexedIndirectX": 0x01,
 	"ORAZeroPage":         0x05,
 	"ASLZeroPage":         0x06,
+	"PHP":                 0x08,
 	"ORAImmediate":        0x09,
 	"ASLAccumulator":      0x0A,
 	"ORAAbsolute":         0x0D,
 	"ASLAbsolute":         0x0E,
-	"PHP":                 0x08,
+	"ORAZeroPageX":        0x15,
 	"ASLZeroPageX":        0x16,
 	"CLC":                 0x18,
 	"ORAAbsoluteY":        0x19,
@@ -212,6 +214,23 @@ func ORAZeroPage(c *CPU) {
 	c.programCounter++
 
 	address := uint16(c.ram[c.programCounter])
+
+	value := c.readMemory(address)
+
+	c.accumulator |= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+
+	c.programCounter++
+}
+
+// ORAZeroPageX - OR with Accumulator. ORA performs a logical OR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ORAZeroPageX(c *CPU) {
+	c.programCounter++
+
+	address := uint16(c.ram[c.programCounter] + c.xRegister)
 
 	value := c.readMemory(address)
 
