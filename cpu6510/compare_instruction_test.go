@@ -437,16 +437,18 @@ func TestCMPZeroPage(t *testing.T) {
 	})
 }
 
-func TestCMPIndexedIndirectX(t *testing.T) {
+func TestCMPIndexedIndirect(t *testing.T) {
 	t.Run("Accumulator is greater than memory", func(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x42
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
 		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirect"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -467,9 +469,11 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
 		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0x37
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirect"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -489,10 +493,12 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.accumulator = 0x42
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x42
+		cpu.ram[0x14] = 0x37
+		cpu.ram[0x15] = 0x13
+		cpu.ram[0x1337] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirect"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -517,9 +523,11 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 		cpu.xRegister = 0xFF
 		cpu.ram[1] = 0x13
 		cpu.ram[0x12] = 0x37
+		cpu.ram[0x13] = 0x13
+		cpu.ram[0x1337] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("CMPIndexedIndirectX"))
+		cpu.execute(InstructionAsHex("CMPIndexedIndirect"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -535,16 +543,18 @@ func TestCMPIndexedIndirectX(t *testing.T) {
 	})
 }
 
-func TestCMPIndirectIndexedY(t *testing.T) {
+func TestCMPIndirectIndexed(t *testing.T) {
 	t.Run("Accumulator is greater than memory", func(t *testing.T) {
 		cpu := NewCPU()
 		cpu.accumulator = 0x42
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0x37
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexed"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -564,10 +574,12 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.accumulator = 0x01
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
+		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0x37
 		cpu.statusRegister.carryFlag = true
 
-		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexed"))
 
 		if cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be cleared")
@@ -587,10 +599,12 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 		cpu.accumulator = 0x42
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x42
+		cpu.ram[0x13] = 0x37
+		cpu.ram[0x14] = 0x13
+		cpu.ram[0x1338] = 0x42
 		cpu.statusRegister.carryFlag = false
 
-		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
+		cpu.execute(InstructionAsHex("CMPIndirectIndexed"))
 
 		if !cpu.statusRegister.carryFlag {
 			t.Errorf("Carry flag should be set")
@@ -598,29 +612,6 @@ func TestCMPIndirectIndexedY(t *testing.T) {
 
 		if !cpu.statusRegister.zeroFlag {
 			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-
-	t.Run("Index wraps around", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x42
-		cpu.yRegister = 0xFF
-		cpu.ram[1] = 0x14
-		cpu.ram[0x13] = 0x42
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("CMPIndirectIndexedY"))
-
-		if !cpu.statusRegister.carryFlag {
-			t.Errorf("Carry flag should be set")
-		}
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
 		}
 
 		if cpu.statusRegister.negativeFlag {

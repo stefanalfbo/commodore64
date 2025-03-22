@@ -36,13 +36,13 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0xAA: TAX,
 	0xBA: TSX,
 	0xB8: CLV,
-	0xC1: CMPIndexedIndirectX,
+	0xC1: CMPIndexedIndirect,
 	0xC5: CMPZeroPage,
 	0xC8: INY,
 	0xC9: CMPImmediate,
 	0xCA: DEX,
 	0xCD: CMPAbsolute,
-	0xD1: CMPIndirectIndexedY,
+	0xD1: CMPIndirectIndexed,
 	0xD5: CMPZeroPageX,
 	0xD8: CLD,
 	0xD9: CMPAbsoluteY,
@@ -62,51 +62,51 @@ func InstructionAsHex(name string) byte {
 }
 
 var instructions = map[string]byte{
-	"BRK":                 0x00,
-	"ORAIndexedIndirect":  0x01,
-	"ORAZeroPage":         0x05,
-	"ASLZeroPage":         0x06,
-	"PHP":                 0x08,
-	"ORAImmediate":        0x09,
-	"ASLAccumulator":      0x0A,
-	"ORAAbsolute":         0x0D,
-	"ASLAbsolute":         0x0E,
-	"ORAIndirectIndexed":  0x11,
-	"ORAZeroPageX":        0x15,
-	"ASLZeroPageX":        0x16,
-	"CLC":                 0x18,
-	"ORAAbsoluteY":        0x19,
-	"ORAAbsoluteX":        0x1D,
-	"ASLAbsoluteX":        0x1E,
-	"PLP":                 0x28,
-	"SEC":                 0x38,
-	"PHA":                 0x48,
-	"CLI":                 0x58,
-	"RTS":                 0x60,
-	"PLA":                 0x68,
-	"SEI":                 0x78,
-	"DEY":                 0x88,
-	"TXA":                 0x8A,
-	"TYA":                 0x98,
-	"TXS":                 0x9A,
-	"TAY":                 0xA8,
-	"TAX":                 0xAA,
-	"TSX":                 0xBA,
-	"CLV":                 0xB8,
-	"CMPIndexedIndirectX": 0xC1,
-	"CMPZeroPage":         0xC5,
-	"INY":                 0xC8,
-	"CMPImmediate":        0xC9,
-	"DEX":                 0xCA,
-	"CMPAbsolute":         0xCD,
-	"CMPIndirectIndexedY": 0xD1,
-	"CMPZeroPageX":        0xD5,
-	"CLD":                 0xD8,
-	"CMPAbsoluteY":        0xD9,
-	"CMPAbsoluteX":        0xDD,
-	"NOP":                 0xEA,
-	"INX":                 0xE8,
-	"SED":                 0xF8,
+	"BRK":                0x00,
+	"ORAIndexedIndirect": 0x01,
+	"ORAZeroPage":        0x05,
+	"ASLZeroPage":        0x06,
+	"PHP":                0x08,
+	"ORAImmediate":       0x09,
+	"ASLAccumulator":     0x0A,
+	"ORAAbsolute":        0x0D,
+	"ASLAbsolute":        0x0E,
+	"ORAIndirectIndexed": 0x11,
+	"ORAZeroPageX":       0x15,
+	"ASLZeroPageX":       0x16,
+	"CLC":                0x18,
+	"ORAAbsoluteY":       0x19,
+	"ORAAbsoluteX":       0x1D,
+	"ASLAbsoluteX":       0x1E,
+	"PLP":                0x28,
+	"SEC":                0x38,
+	"PHA":                0x48,
+	"CLI":                0x58,
+	"RTS":                0x60,
+	"PLA":                0x68,
+	"SEI":                0x78,
+	"DEY":                0x88,
+	"TXA":                0x8A,
+	"TYA":                0x98,
+	"TXS":                0x9A,
+	"TAY":                0xA8,
+	"TAX":                0xAA,
+	"TSX":                0xBA,
+	"CLV":                0xB8,
+	"CMPIndexedIndirect": 0xC1,
+	"CMPZeroPage":        0xC5,
+	"INY":                0xC8,
+	"CMPImmediate":       0xC9,
+	"DEX":                0xCA,
+	"CMPAbsolute":        0xCD,
+	"CMPIndirectIndexed": 0xD1,
+	"CMPZeroPageX":       0xD5,
+	"CLD":                0xD8,
+	"CMPAbsoluteY":       0xD9,
+	"CMPAbsoluteX":       0xDD,
+	"NOP":                0xEA,
+	"INX":                0xE8,
+	"SED":                0xF8,
 }
 
 // ConvertTwoBytesToAddress - converts two bytes into a single address.
@@ -571,30 +571,24 @@ func CMPAbsoluteX(c *CPU) {
 	cmp(c, value)
 }
 
-// CMPIndexedIndirectX - CoMPare. CMP compares the value in the accumulator with
+// CMPIndexedIndirect - CoMPare. CMP compares the value in the accumulator with
 // the value in memory, and sets the zero and negative flags in the status
 // register based on the result.
-func CMPIndexedIndirectX(c *CPU) {
+func CMPIndexedIndirect(c *CPU) {
 	c.programCounter++
 
-	address := uint8(c.ram[c.programCounter]) + uint8(c.xRegister)
-
-	value := c.readMemory(uint16(address))
+	value := c.getValueByIndexedIndirectAddressingMode()
 
 	cmp(c, value)
-
-	c.programCounter++
 }
 
-// CMPIndirectIndexedY - CoMPare. CMP compares the value in the accumulator with
+// CMPIndirectIndexed - CoMPare. CMP compares the value in the accumulator with
 // the value in memory, and sets the zero and negative flags in the status
 // register based on the result.
-func CMPIndirectIndexedY(c *CPU) {
+func CMPIndirectIndexed(c *CPU) {
 	c.programCounter++
 
-	address := uint8(c.ram[c.programCounter]) + uint8(c.yRegister)
-
-	value := c.readMemory(uint16(address))
+	value := c.getValueByIndirectIndexedAddressingMode()
 
 	cmp(c, value)
 
