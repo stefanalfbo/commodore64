@@ -21,8 +21,16 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x19: ORAAbsoluteY,
 	0x1D: ORAAbsoluteX,
 	0x1E: ASLAbsoluteX,
+	0x21: ANDIndexedIndirect,
+	0x25: ANDZeroPage,
 	0x28: PLP,
+	0x29: ANDImmediate,
+	0x2D: ANDAbsolute,
+	0x31: ANDIndirectIndexed,
+	0x35: ANDZeroPageX,
 	0x38: SEC,
+	0x39: ANDAbsoluteY,
+	0x3D: ANDAbsoluteX,
 	0x48: PHA,
 	0x58: CLI,
 	0x60: RTS,
@@ -78,8 +86,16 @@ var instructions = map[string]byte{
 	"ORAAbsoluteY":       0x19,
 	"ORAAbsoluteX":       0x1D,
 	"ASLAbsoluteX":       0x1E,
+	"ANDIndexedIndirect": 0x21,
+	"ANDZeroPage":        0x25,
 	"PLP":                0x28,
+	"ANDImmediate":       0x29,
+	"ANDAbsolute":        0x2D,
+	"ANDIndirectIndexed": 0x31,
+	"ANDZeroPageX":       0x35,
 	"SEC":                0x38,
+	"ANDAbsoluteY":       0x39,
+	"ANDAbsoluteX":       0x3D,
 	"PHA":                0x48,
 	"CLI":                0x58,
 	"RTS":                0x60,
@@ -210,6 +226,74 @@ func ORAIndexedIndirect(c *CPU) {
 // the result in the accumulator.
 func ORAIndirectIndexed(c *CPU) {
 	ora(c, c.getValueByIndirectIndexedAddressingMode)
+}
+
+// AND - Logical AND. AND performs a logical AND between the value in the
+// accumulator and the given value, and stores the result in the accumulator.
+func and(c *CPU, getValue func() byte) {
+	c.programCounter++
+
+	value := getValue()
+
+	c.accumulator &= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+}
+
+// ANDImmediate - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDImmediate(c *CPU) {
+	and(c, c.getValueByImmediateAddressingMode)
+}
+
+// ANDAbsolute - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDAbsolute(c *CPU) {
+	and(c, c.getValueByAbsoluteAddressingMode)
+}
+
+// ANDAbsoluteX - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDAbsoluteX(c *CPU) {
+	and(c, c.getValueByAbsoluteXAddressingMode)
+}
+
+// ANDAbsoluteY - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDAbsoluteY(c *CPU) {
+	and(c, c.getValueByAbsoluteYAddressingMode)
+}
+
+// ANDZeroPage - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDZeroPage(c *CPU) {
+	and(c, c.getValueByZeroPageAddressingMode)
+}
+
+// ANDZeroPageX - Logical AND. AND performs a logical AND between the value in
+// the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func ANDZeroPageX(c *CPU) {
+	and(c, c.getValueByZeroPageXAddressingMode)
+}
+
+// ANDIndexedIndirect - Logical AND. AND performs a logical AND between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ANDIndexedIndirect(c *CPU) {
+	and(c, c.getValueByIndexedIndirectAddressingMode)
+}
+
+// ANDIndirectIndexed - Logical AND. AND performs a logical AND between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func ANDIndirectIndexed(c *CPU) {
+	and(c, c.getValueByIndirectIndexedAddressingMode)
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
