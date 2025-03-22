@@ -31,8 +31,16 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x38: SEC,
 	0x39: ANDAbsoluteY,
 	0x3D: ANDAbsoluteX,
+	0x41: EORIndexedIndirect,
+	0x45: EORZeroPage,
 	0x48: PHA,
+	0x49: EORImmediate,
+	0x4D: EORAbsolute,
+	0x51: EORIndirectIndexed,
+	0x55: EORZeroPageX,
 	0x58: CLI,
+	0x59: EORAbsoluteY,
+	0x5D: EORAbsoluteX,
 	0x60: RTS,
 	0x68: PLA,
 	0x78: SEI,
@@ -96,8 +104,16 @@ var instructions = map[string]byte{
 	"SEC":                0x38,
 	"ANDAbsoluteY":       0x39,
 	"ANDAbsoluteX":       0x3D,
+	"EORIndexedIndirect": 0x41,
+	"EORZeroPage":        0x45,
 	"PHA":                0x48,
+	"EORImmediate":       0x49,
+	"EORAbsolute":        0x4D,
+	"EORIndirectIndexed": 0x51,
+	"EORZeroPageX":       0x55,
 	"CLI":                0x58,
+	"EORAbsoluteY":       0x59,
+	"EORAbsoluteX":       0x5D,
 	"RTS":                0x60,
 	"PLA":                0x68,
 	"SEI":                0x78,
@@ -294,6 +310,72 @@ func ANDIndexedIndirect(c *CPU) {
 // the accumulator.
 func ANDIndirectIndexed(c *CPU) {
 	and(c, c.getValueByIndirectIndexedAddressingMode)
+}
+
+func eor(c *CPU, getValue func() byte) {
+	c.programCounter++
+
+	value := getValue()
+
+	c.accumulator ^= value
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+}
+
+// EORImmediate - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORImmediate(c *CPU) {
+	eor(c, c.getValueByImmediateAddressingMode)
+}
+
+// EORAbsolute - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORAbsolute(c *CPU) {
+	eor(c, c.getValueByAbsoluteAddressingMode)
+}
+
+// EORAbsoluteX - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORAbsoluteX(c *CPU) {
+	eor(c, c.getValueByAbsoluteXAddressingMode)
+}
+
+// EORAbsoluteY - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORAbsoluteY(c *CPU) {
+	eor(c, c.getValueByAbsoluteYAddressingMode)
+}
+
+// EORZeroPage - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORZeroPage(c *CPU) {
+	eor(c, c.getValueByZeroPageAddressingMode)
+}
+
+// EORZeroPageX - Exclusive OR. EOR performs a logical XOR between the value
+// in the accumulator and the value in memory, and stores the result in the
+// accumulator.
+func EORZeroPageX(c *CPU) {
+	eor(c, c.getValueByZeroPageXAddressingMode)
+}
+
+// EORIndexedIndirect - Exclusive OR. EOR performs a logical XOR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func EORIndexedIndirect(c *CPU) {
+	eor(c, c.getValueByIndexedIndirectAddressingMode)
+}
+
+// EORIndirectIndexed - Exclusive OR. EOR performs a logical XOR between the
+// value in the accumulator and the value in memory, and stores the result in
+// the accumulator.
+func EORIndirectIndexed(c *CPU) {
+	eor(c, c.getValueByIndirectIndexedAddressingMode)
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
