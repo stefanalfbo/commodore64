@@ -40,1226 +40,288 @@ func TestImmediateAddressingModeInstructions(t *testing.T) {
 	}
 }
 
-func TestORAAbsolute(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestAbsoluteAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAAbsolute", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAAbsolute", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDAbsolute", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDAbsolute", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORAbsolute", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORAbsolute", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.ram[1] = 0x37
 		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10101010
+		cpu.ram[0x1337] = test.value
 
-		cpu.execute(InstructionAsHex("ORAAbsolute"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAAbsolute"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAAbsolute"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAAbsoluteX(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestAbsoluteXAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAAbsoluteX", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAAbsoluteX", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDAbsoluteX", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDAbsoluteX", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORAbsoluteX", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORAbsoluteX", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x37
 		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
+		cpu.ram[0x1338] = test.value
 
-		cpu.execute(InstructionAsHex("ORAAbsoluteX"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAAbsoluteX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAAbsoluteX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAAbsoluteY(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestAbsoluteYAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAAbsoluteY", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAAbsoluteY", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDAbsoluteY", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDAbsoluteY", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORAbsoluteY", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORAbsoluteY", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x37
 		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
+		cpu.ram[0x1338] = test.value
 
-		cpu.execute(InstructionAsHex("ORAAbsoluteY"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAAbsoluteY"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAAbsoluteY"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAZeroPage(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestZeroPageAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAZeroPage", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAZeroPage", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDZeroPage", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDZeroPage", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORZeroPage", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORZeroPage", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10101010
+		cpu.ram[0x13] = test.value
 
-		cpu.execute(InstructionAsHex("ORAZeroPage"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAZeroPage"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAZeroPage"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAZeroPageX(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestZeroPageXAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAZeroPageX", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAZeroPageX", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDZeroPageX", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDZeroPageX", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORZeroPageX", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORZeroPageX", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
+		cpu.accumulator = test.accumulator
 		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
+		cpu.ram[0x13] = test.value
 
-		cpu.execute(InstructionAsHex("ORAZeroPageX"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAZeroPageX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAZeroPageX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAIndexedIndirect(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestIndexedIndirectAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAIndexedIndirect", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAIndexedIndirect", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDIndexedIndirect", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDIndexedIndirect", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORIndexedIndirect", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORIndexedIndirect", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
 		cpu.ram[0x14] = 0x37
 		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10101010
+		cpu.ram[0x1337] = test.value
 
-		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAIndexedIndirect"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
-func TestORAIndirectIndexed(t *testing.T) {
-	t.Run("Bit-wise boolean or between each eight bits", func(t *testing.T) {
+func TestIndirectIndexedAddressingModeInstructions(t *testing.T) {
+	tests := []struct {
+		instruction  string
+		accumulator  byte
+		value        byte
+		expected     byte
+		zeroFlag     bool
+		negativeFlag bool
+	}{
+		{"ORAIndirectIndexed", 0b01010101, 0b10101010, 0b11111111, false, true},
+		{"ORAIndirectIndexed", 0b00000000, 0b00000000, 0b00000000, true, false},
+		{"ANDIndirectIndexed", 0b10101010, 0b10101010, 0b10101010, false, true},
+		{"ANDIndirectIndexed", 0b01010101, 0b10101010, 0b00000000, true, false},
+		{"EORIndirectIndexed", 0b00110011, 0b11000011, 0b11110000, false, true},
+		{"EORIndirectIndexed", 0b00000001, 0b00000001, 0b00000000, true, false},
+	}
+
+	for _, test := range tests {
 		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
+		cpu.accumulator = test.accumulator
 		cpu.yRegister = 0x01
 		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0x37
 		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10101010
+		cpu.ram[0x1338] = test.value
 
-		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
+		cpu.execute(InstructionAsHex(test.instruction))
 
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
+		if cpu.accumulator != test.expected {
+			t.Errorf("Accumulator should be %08b, got %08b for instruction: %s", test.expected, cpu.accumulator, test.instruction)
 		}
-	})
 
-	t.Run("The OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ORAIndirectIndexed"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDAbsolute(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDAbsolute"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDAbsolute"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDAbsolute"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDAbsoluteX(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteX"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDAbsoluteY(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteY"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteY"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDAbsoluteY"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDZeroPage(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDZeroPage"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDZeroPage"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDZeroPage"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDZeroPageX(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDZeroPageX"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDZeroPageX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDZeroPageX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDIndexedIndirect(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDIndexedIndirect"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDIndexedIndirect"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDIndexedIndirect"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestANDIndirectIndexed(t *testing.T) {
-	t.Run("Bit-wise boolean and between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10101010
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("ANDIndirectIndexed"))
-
-		if cpu.accumulator != 0b10101010 {
-			t.Errorf("Accumulator should be 0b10101010")
-		}
-	})
-
-	t.Run("The AND operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b10000000
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("ANDIndirectIndexed"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The AND operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("ANDIndirectIndexed"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORAbsolute(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORAbsolute"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORAbsolute"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1337] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORAbsolute"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORAbsoluteX(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORAbsoluteX"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORAbsoluteX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORAbsoluteX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORAbsoluteY(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORAbsoluteY"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORAbsoluteY"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x37
-		cpu.ram[2] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORAbsoluteY"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORZeroPage(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORZeroPage"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORZeroPage"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORZeroPage"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORZeroPageX(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORZeroPageX"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORZeroPageX"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORZeroPageX"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORIndexedIndirect(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORIndexedIndirect"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORIndexedIndirect"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.xRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x14] = 0x37
-		cpu.ram[0x15] = 0x13
-		cpu.ram[0x1337] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORIndexedIndirect"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestEORIndirectIndexed(t *testing.T) {
-	t.Run("Bit-wise boolean exclusive or between each eight bits", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b01010101
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10101010
-
-		cpu.execute(InstructionAsHex("EORIndirectIndexed"))
-
-		if cpu.accumulator != 0b11111111 {
-			t.Errorf("Accumulator should be 0b11111111")
-		}
-	})
-
-	t.Run("The exclusive OR operation has its most significant bit set", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0b00000001
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0b10000000
-
-		cpu.execute(InstructionAsHex("EORIndirectIndexed"))
-
-		if cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be cleared")
-		}
-
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
-		}
-	})
-
-	t.Run("The exclusive OR operation result is zero", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.accumulator = 0x00
-		cpu.yRegister = 0x01
-		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = 0x37
-		cpu.ram[0x14] = 0x13
-		cpu.ram[0x1338] = 0x00
-		cpu.statusRegister.carryFlag = false
-
-		cpu.execute(InstructionAsHex("EORIndirectIndexed"))
-
-		if !cpu.statusRegister.zeroFlag {
-			t.Errorf("Zero flag should be set")
-		}
-
-		if cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be cleared")
-		}
-	})
-}
-
-func TestASLZeroPage(t *testing.T) {
-	t.Run("Shift all bits in the memory location specified by the single byte address", func(t *testing.T) {
-		cpu := NewCPU()
-		expectedPC := cpu.programCounter + 2
-		cpu.ram[cpu.programCounter+1] = 0x03
-		cpu.ram[0x03] = 0x03
-
-		cpu.execute(InstructionAsHex("ASLZeroPage"))
-
-		if cpu.ram[0x03] != 0x06 {
-			t.Errorf("Memory location should be shifted left")
-		}
-
-		if cpu.statusRegister.carryFlag {
-			t.Errorf("Carry flag should be cleared")
-		}
-
-		if cpu.programCounter != expectedPC {
-			t.Errorf("Program counter should be incremented")
-		}
-	})
-
-	t.Run("Shift all bits in the memory location specified by the single byte address and set carry flag", func(t *testing.T) {
-		cpu := NewCPU()
-		expectedPC := cpu.programCounter + 2
-		cpu.ram[cpu.programCounter+1] = 0x03
-		cpu.ram[0x03] = 0x80
-
-		cpu.execute(InstructionAsHex("ASLZeroPage"))
-
-		if cpu.ram[0x03] != 0x00 {
-			t.Errorf("Memory location should be shifted left")
-		}
-
-		if !cpu.statusRegister.carryFlag {
-			t.Errorf("Carry flag should be set")
-		}
-
-		if cpu.programCounter != expectedPC {
-			t.Errorf("Program counter should be incremented")
-		}
-	})
-
-	t.Run("Shift all bits in the memory location specified by the single byte address and set negative flag", func(t *testing.T) {
-		cpu := NewCPU()
-		cpu.ram[cpu.programCounter+1] = 0x03
-		cpu.ram[0x03] = 0x40
-
-		cpu.execute(InstructionAsHex("ASLZeroPage"))
-
-		if cpu.ram[0x03] != 0x80 {
-			t.Errorf("Memory location should be shifted left")
-		}
-
-		if cpu.statusRegister.carryFlag {
-			t.Errorf("Carry flag should be cleared")
+		if cpu.statusRegister.zeroFlag != test.zeroFlag {
+			t.Errorf("Zero flag should be %t, got %t for instruction: %s", test.zeroFlag, cpu.statusRegister.zeroFlag, test.instruction)
 		}
 
-		if !cpu.statusRegister.negativeFlag {
-			t.Errorf("Negative flag should be set")
+		if cpu.statusRegister.negativeFlag != test.negativeFlag {
+			t.Errorf("Negative flag should be %t, got %t for instruction: %s", test.negativeFlag, cpu.statusRegister.negativeFlag, test.instruction)
 		}
-	})
+	}
 }
 
 func TestASLAccumulator(t *testing.T) {
@@ -1393,6 +455,70 @@ func TestASLAbsolute(t *testing.T) {
 
 		if cpu.programCounter != expectedPC {
 			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
+func TestASLZeroPage(t *testing.T) {
+	t.Run("Shift all bits in the memory location specified by the single byte address", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x03
+
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x06 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the memory location specified by the single byte address and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x80
+
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x00 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits in the memory location specified by the single byte address and set negative flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[cpu.programCounter+1] = 0x03
+		cpu.ram[0x03] = 0x40
+
+		cpu.execute(InstructionAsHex("ASLZeroPage"))
+
+		if cpu.ram[0x03] != 0x80 {
+			t.Errorf("Memory location should be shifted left")
+		}
+
+		if cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be cleared")
+		}
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
 		}
 	})
 }
