@@ -221,8 +221,9 @@ func TestZeroPageXAddressingModeInstructions(t *testing.T) {
 	for _, test := range tests {
 		cpu := NewCPU()
 		cpu.accumulator = test.accumulator
+		cpu.xRegister = 0x01
 		cpu.ram[1] = 0x13
-		cpu.ram[0x13] = test.value
+		cpu.ram[0x14] = test.value
 
 		cpu.execute(InstructionAsHex(test.instruction))
 
@@ -667,6 +668,250 @@ func TestASLAbsoluteX(t *testing.T) {
 
 		if cpu.programCounter != expectedPC {
 			t.Errorf("Program counter should be incremented")
+		}
+	})
+}
+
+func TestLSRAccumulator(t *testing.T) {
+	t.Run("Shift all bits right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.accumulator = 0b11000000
+
+		cpu.execute(InstructionAsHex("LSRAccumulator"))
+
+		if cpu.accumulator != 0b01100000 {
+			t.Errorf("Accumulator should be shifted right, expected 0x60, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits right and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.accumulator = 0b10000000
+
+		cpu.execute(InstructionAsHex("LSRAccumulator"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Shift all bits right and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.accumulator = 0x01
+
+		cpu.execute(InstructionAsHex("LSRAccumulator"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestLSRAbsolute(t *testing.T) {
+	t.Run("Shift all bits right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 3
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0b11000000
+
+		cpu.execute(InstructionAsHex("LSRAbsolute"))
+
+		if cpu.ram[0x1337] != 0b01100000 {
+			t.Errorf("Value should be shifted right, expected 0x60, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits right and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0b10000000
+
+		cpu.execute(InstructionAsHex("LSRAbsolute"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Shift all bits right and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0x01
+
+		cpu.execute(InstructionAsHex("LSRAbsolute"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestLSRAbsoluteX(t *testing.T) {
+	t.Run("Shift all bits right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 3
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0b11000000
+
+		cpu.execute(InstructionAsHex("LSRAbsoluteX"))
+
+		if cpu.ram[0x1338] != 0b01100000 {
+			t.Errorf("Value should be shifted right, expected 0x60, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits right and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0b10000000
+
+		cpu.execute(InstructionAsHex("LSRAbsoluteX"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Shift all bits right and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0x01
+
+		cpu.execute(InstructionAsHex("LSRAbsoluteX"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestLSRZeroPage(t *testing.T) {
+	t.Run("Shift all bits right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0b11000000
+
+		cpu.execute(InstructionAsHex("LSRZeroPage"))
+
+		if cpu.ram[0x13] != 0b01100000 {
+			t.Errorf("Value should be shifted right, expected 0x60, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits right and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0b10000000
+
+		cpu.execute(InstructionAsHex("LSRZeroPage"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Shift all bits right and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0x01
+
+		cpu.execute(InstructionAsHex("LSRZeroPage"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestLSRZeroPageX(t *testing.T) {
+	t.Run("Shift all bits right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0b11000000
+
+		cpu.execute(InstructionAsHex("LSRZeroPageX"))
+
+		if cpu.ram[0x14] != 0b01100000 {
+			t.Errorf("Value should be shifted right, expected 0x60, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Shift all bits right and set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0b10000000
+
+		cpu.execute(InstructionAsHex("LSRZeroPageX"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Shift all bits right and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0x01
+
+		cpu.execute(InstructionAsHex("LSRZeroPageX"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
 		}
 	})
 }

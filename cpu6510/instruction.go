@@ -33,14 +33,19 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x3D: ANDAbsoluteX,
 	0x41: EORIndexedIndirect,
 	0x45: EORZeroPage,
+	0x46: LSRZeroPage,
 	0x48: PHA,
 	0x49: EORImmediate,
+	0x4A: LSRAccumulator,
 	0x4D: EORAbsolute,
+	0x4E: LSRAbsolute,
 	0x51: EORIndirectIndexed,
 	0x55: EORZeroPageX,
+	0x56: LSRZeroPageX,
 	0x58: CLI,
 	0x59: EORAbsoluteY,
 	0x5D: EORAbsoluteX,
+	0x5E: LSRAbsoluteX,
 	0x60: RTS,
 	0x68: PLA,
 	0x78: SEI,
@@ -106,14 +111,19 @@ var instructions = map[string]byte{
 	"ANDAbsoluteX":       0x3D,
 	"EORIndexedIndirect": 0x41,
 	"EORZeroPage":        0x45,
+	"LSRZeroPage":        0x46,
 	"PHA":                0x48,
 	"EORImmediate":       0x49,
+	"LSRAccumulator":     0x4A,
 	"EORAbsolute":        0x4D,
+	"LSRAbsolute":        0x4E,
 	"EORIndirectIndexed": 0x51,
 	"EORZeroPageX":       0x55,
+	"LSRZeroPageX":       0x56,
 	"CLI":                0x58,
 	"EORAbsoluteY":       0x59,
 	"EORAbsoluteX":       0x5D,
+	"LSRAbsoluteX":       0x5E,
 	"RTS":                0x60,
 	"PLA":                0x68,
 	"SEI":                0x78,
@@ -378,6 +388,64 @@ func EORIndirectIndexed(c *CPU) {
 	eor(c, c.getValueByIndirectIndexedAddressingMode)
 }
 
+// LSRAccumulator - Logical Shift Right. LSR shifts all bits in the accumulator
+// register.
+func LSRAccumulator(c *CPU) {
+	c.programCounter++
+
+	c.statusRegister.carryFlag = setCarryFlag(c.accumulator)
+
+	c.accumulator >>= 1
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+	// The negative status flag is always unconditionally cleared.
+	c.statusRegister.negativeFlag = false
+}
+
+// LSR - Logical Shift Right. LSR shifts all bits in the memory location
+// specified by the address.
+func lsr(c *CPU, getAddress func() uint16) {
+	c.programCounter++
+
+	address := getAddress()
+
+	value := c.readMemory(address)
+
+	c.statusRegister.carryFlag = setCarryFlag(value)
+
+	value >>= 1
+
+	raiseStatusRegisterFlags(c, value)
+	// The negative status flag is always unconditionally cleared.
+	c.statusRegister.negativeFlag = false
+
+	c.writeMemory(address, value)
+}
+
+// LSRAbsolute - Logical Shift Right. LSR shifts all bits in the memory
+// location specified by the two byte address.
+func LSRAbsolute(c *CPU) {
+	lsr(c, c.addressAbsolute)
+}
+
+// LSRAbsoluteX - Logical Shift Right. LSR shifts all bits in the memory
+// location specified by the two byte address plus the X index register.
+func LSRAbsoluteX(c *CPU) {
+	lsr(c, c.addressAbsoluteX)
+}
+
+// LSRZeroPage - Logical Shift Right. LSR shifts all bits in the memory
+// location specified by the single byte address.
+func LSRZeroPage(c *CPU) {
+	lsr(c, c.addressZeroPage)
+}
+
+// LSRZeroPageX - Logical Shift Right. LSR shifts all bits in the memory
+// location specified by the single byte address plus the X index register.
+func LSRZeroPageX(c *CPU) {
+	lsr(c, c.addressZeroPageX)
+}
+
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
 // location specified by the single byte address.
 func ASLZeroPage(c *CPU) {
@@ -401,13 +469,14 @@ func ASLZeroPage(c *CPU) {
 // ASLAccumulator - Arithmetic Shift Left. ASL shifts all bits in the
 // accumulator.
 func ASLAccumulator(c *CPU) {
-	c.statusRegister.carryFlag = c.accumulator&0x80 == 0x80
+	c.programCounter++
+
+	c.statusRegister.carryFlag = setCarryFlag(c.accumulator)
 
 	c.accumulator <<= 1
 
 	raiseStatusRegisterFlags(c, c.accumulator)
 
-	c.programCounter++
 }
 
 // ASLAbsolute - Arithmetic Shift Left. ASL shifts all bits in the memory

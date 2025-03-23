@@ -17,14 +17,31 @@ func (c *CPU) getValueByAbsoluteAddressingMode() byte {
 	return c.readMemory(address)
 }
 
+// addressAbsolute - returns the address specified by the next two bytes in
+// memory.
+func (c *CPU) addressAbsolute() uint16 {
+	address := c.readAddressFromMemory()
+	c.programCounter += 2
+
+	return address
+}
+
 // getValueByAbsoluteXAddressingMode - returns the value in memory at the
 // address specified by the next two bytes in memory plus the value of the
 // X register.
 func (c *CPU) getValueByAbsoluteXAddressingMode() byte {
+	address := c.addressAbsoluteX()
+
+	return c.readMemory(address)
+}
+
+// addressAbsoluteX - returns the address specified by the next two bytes in
+// memory plus the value of the X register.
+func (c *CPU) addressAbsoluteX() uint16 {
 	address := c.readAddressFromMemory() + uint16(c.xRegister)
 	c.programCounter += 2
 
-	return c.readMemory(address)
+	return address
 }
 
 // getValueByAbsoluteYAddressingMode - returns the value in memory at the
@@ -40,20 +57,35 @@ func (c *CPU) getValueByAbsoluteYAddressingMode() byte {
 // getValueByZeroPageAddressingMode - returns the value in memory at the
 // address specified by the next byte in memory.
 func (c *CPU) getValueByZeroPageAddressingMode() byte {
+	address := c.addressZeroPage()
+
+	return c.readMemory(address)
+}
+
+// addressZeroPage - returns the address specified by the next byte in memory.
+func (c *CPU) addressZeroPage() uint16 {
 	address := uint16(c.ram[c.programCounter])
 	c.programCounter++
 
-	return c.readMemory(address)
+	return address
 }
 
 // getValueByZeroPageXAddressingMode - returns the value in memory at the
 // address specified by the next byte in memory plus the value of the X
 // register.
 func (c *CPU) getValueByZeroPageXAddressingMode() byte {
+	address := c.addressZeroPageX()
+
+	return c.readMemory(address)
+}
+
+// addressZeroPageX - returns the address specified by the next byte in memory
+// plus the value of the X register.
+func (c *CPU) addressZeroPageX() uint16 {
 	address := uint16(c.ram[c.programCounter] + c.xRegister)
 	c.programCounter++
 
-	return c.readMemory(address)
+	return address
 }
 
 // getValueByIndexedIndirectAddressingMode - returns the value in memory at
