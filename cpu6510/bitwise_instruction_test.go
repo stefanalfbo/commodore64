@@ -915,3 +915,267 @@ func TestLSRZeroPageX(t *testing.T) {
 		}
 	})
 }
+
+func TestRORAccumulator(t *testing.T) {
+	t.Run("Rotate right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 1
+		cpu.accumulator = 0b10010001
+
+		cpu.execute(InstructionAsHex("RORAccumulator"))
+
+		if cpu.accumulator != 0b01001000 {
+			t.Errorf("Accumulator should be shifted right, expected 0x48, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Rotate right set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.accumulator = 0b00000001
+
+		cpu.execute(InstructionAsHex("RORAccumulator"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Rotate and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.accumulator = 0x01
+
+		cpu.execute(InstructionAsHex("RORAccumulator"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestRORAbsolute(t *testing.T) {
+	t.Run("Rotate right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 3
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0b10010001
+
+		cpu.execute(InstructionAsHex("RORAbsolute"))
+
+		if cpu.ram[0x1337] != 0b01001000 {
+			t.Errorf("Value should be shifted right, expected 0x48, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Rotate right set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0b00000001
+
+		cpu.execute(InstructionAsHex("RORAbsolute"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Rotate and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1337] = 0x01
+
+		cpu.execute(InstructionAsHex("RORAbsolute"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestRORAbsoluteX(t *testing.T) {
+	t.Run("Rotate right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 3
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0b10010001
+
+		cpu.execute(InstructionAsHex("RORAbsoluteX"))
+
+		if cpu.ram[0x1338] != 0b01001000 {
+			t.Errorf("Value should be shifted right, expected 0x48, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Rotate right set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0b00000001
+
+		cpu.execute(InstructionAsHex("RORAbsoluteX"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Rotate and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x37
+		cpu.ram[2] = 0x13
+		cpu.ram[0x1338] = 0x01
+
+		cpu.execute(InstructionAsHex("RORAbsoluteX"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestRORZeroPage(t *testing.T) {
+	t.Run("Rotate right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0b10010001
+
+		cpu.execute(InstructionAsHex("RORZeroPage"))
+
+		if cpu.ram[0x13] != 0b01001000 {
+			t.Errorf("Value should be shifted right, expected 0x48, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Rotate right set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0b00000001
+
+		cpu.execute(InstructionAsHex("RORZeroPage"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Rotate and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[1] = 0x13
+		cpu.ram[0x13] = 0x01
+
+		cpu.execute(InstructionAsHex("RORZeroPage"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}
+
+func TestRORZeroPageX(t *testing.T) {
+	t.Run("Rotate right", func(t *testing.T) {
+		cpu := NewCPU()
+		expectedPC := cpu.programCounter + 2
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0b10010001
+
+		cpu.execute(InstructionAsHex("RORZeroPageX"))
+
+		if cpu.ram[0x14] != 0b01001000 {
+			t.Errorf("Value should be shifted right, expected 0x48, got 0x%02x", cpu.accumulator)
+		}
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+
+		if cpu.programCounter != expectedPC {
+			t.Errorf("Program counter should be incremented")
+		}
+	})
+
+	t.Run("Rotate right set carry flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0b00000001
+
+		cpu.execute(InstructionAsHex("RORZeroPageX"))
+
+		if !cpu.statusRegister.carryFlag {
+			t.Errorf("Carry flag should be set")
+		}
+	})
+
+	t.Run("Rotate and set zero flag", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.xRegister = 0x01
+		cpu.ram[1] = 0x13
+		cpu.ram[0x14] = 0x01
+
+		cpu.execute(InstructionAsHex("RORZeroPageX"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+}

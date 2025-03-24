@@ -47,8 +47,13 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x5D: EORAbsoluteX,
 	0x5E: LSRAbsoluteX,
 	0x60: RTS,
+	0x66: RORZeroPage,
 	0x68: PLA,
+	0x6A: RORAccumulator,
+	0x6E: RORAbsolute,
+	0x76: RORZeroPageX,
 	0x78: SEI,
+	0x7E: RORAbsoluteX,
 	0x88: DEY,
 	0x8A: TXA,
 	0x98: TYA,
@@ -125,8 +130,13 @@ var instructions = map[string]byte{
 	"EORAbsoluteX":       0x5D,
 	"LSRAbsoluteX":       0x5E,
 	"RTS":                0x60,
+	"RORZeroPage":        0x66,
 	"PLA":                0x68,
+	"RORAccumulator":     0x6A,
+	"RORAbsolute":        0x6E,
+	"RORZeroPageX":       0x76,
 	"SEI":                0x78,
+	"RORAbsoluteX":       0x7E,
 	"DEY":                0x88,
 	"TXA":                0x8A,
 	"TYA":                0x98,
@@ -444,6 +454,69 @@ func LSRZeroPage(c *CPU) {
 // location specified by the single byte address plus the X index register.
 func LSRZeroPageX(c *CPU) {
 	lsr(c, c.addressZeroPageX)
+}
+
+// ROR - Rotate Right. ROR shifts all bits in the accumulator register.
+func RORAccumulator(c *CPU) {
+	c.programCounter++
+
+	carry := c.statusRegister.carryFlag
+
+	c.statusRegister.carryFlag = c.accumulator&0x01 == 0x01
+
+	c.accumulator >>= 1
+
+	if carry {
+		c.accumulator |= 0x80
+	}
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+}
+
+func ror(c *CPU, getAddress func() uint16) {
+	c.programCounter++
+
+	address := getAddress()
+
+	value := c.readMemory(address)
+
+	carry := c.statusRegister.carryFlag
+
+	c.statusRegister.carryFlag = value&0x01 == 0x01
+
+	value >>= 1
+
+	if carry {
+		value |= 0x80
+	}
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+}
+
+// RORAbsolute - Rotate Right. ROR shifts all bits in the memory location
+// specified by the two byte address.
+func RORAbsolute(c *CPU) {
+	ror(c, c.addressAbsolute)
+}
+
+// RORAbsoluteX - Rotate Right. ROR shifts all bits in the memory location
+// specified by the two byte address plus the X index register.
+func RORAbsoluteX(c *CPU) {
+	ror(c, c.addressAbsoluteX)
+}
+
+// RORZeroPage - Rotate Right. ROR shifts all bits in the memory location
+// specified by the single byte address.
+func RORZeroPage(c *CPU) {
+	ror(c, c.addressZeroPage)
+}
+
+// RORZeroPageX - Rotate Right. ROR shifts all bits in the memory location
+// specified by the single byte address plus the X index register.
+func RORZeroPageX(c *CPU) {
+	ror(c, c.addressZeroPageX)
 }
 
 // ASLZeroPage - Arithmetic Shift Left. ASL shifts all bits in the memory
