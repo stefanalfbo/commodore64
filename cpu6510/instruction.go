@@ -23,13 +23,18 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x1E: ASLAbsoluteX,
 	0x21: ANDIndexedIndirect,
 	0x25: ANDZeroPage,
+	0x26: ROLZeroPage,
 	0x28: PLP,
 	0x29: ANDImmediate,
+	0x2A: ROLAccumulator,
 	0x2D: ANDAbsolute,
+	0x2E: ROLAbsolute,
 	0x31: ANDIndirectIndexed,
 	0x35: ANDZeroPageX,
+	0x36: ROLZeroPageX,
 	0x38: SEC,
 	0x39: ANDAbsoluteY,
+	0x3E: ROLAbsoluteX,
 	0x3D: ANDAbsoluteX,
 	0x41: EORIndexedIndirect,
 	0x45: EORZeroPage,
@@ -106,14 +111,19 @@ var instructions = map[string]byte{
 	"ASLAbsoluteX":       0x1E,
 	"ANDIndexedIndirect": 0x21,
 	"ANDZeroPage":        0x25,
+	"ROLZeroPage":        0x26,
 	"PLP":                0x28,
 	"ANDImmediate":       0x29,
+	"ROLAccumulator":     0x2A,
+	"ROLAbsolute":        0x2E,
 	"ANDAbsolute":        0x2D,
 	"ANDIndirectIndexed": 0x31,
 	"ANDZeroPageX":       0x35,
+	"ROLZeroPageX":       0x36,
 	"SEC":                0x38,
 	"ANDAbsoluteY":       0x39,
 	"ANDAbsoluteX":       0x3D,
+	"ROLAbsoluteX":       0x3E,
 	"EORIndexedIndirect": 0x41,
 	"EORZeroPage":        0x45,
 	"LSRZeroPage":        0x46,
@@ -454,6 +464,69 @@ func LSRZeroPage(c *CPU) {
 // location specified by the single byte address plus the X index register.
 func LSRZeroPageX(c *CPU) {
 	lsr(c, c.addressZeroPageX)
+}
+
+// ROLAccumulator - Rotate Left. ROL shifts all bits in the accumulator register.
+func ROLAccumulator(c *CPU) {
+	c.programCounter++
+
+	carry := c.statusRegister.carryFlag
+
+	c.statusRegister.carryFlag = c.accumulator&0x80 == 0x80
+
+	c.accumulator <<= 1
+
+	if carry {
+		c.accumulator |= 0x01
+	}
+
+	raiseStatusRegisterFlags(c, c.accumulator)
+}
+
+func rol(c *CPU, getAddress func() uint16) {
+	c.programCounter++
+
+	address := getAddress()
+
+	value := c.readMemory(address)
+
+	carry := c.statusRegister.carryFlag
+
+	c.statusRegister.carryFlag = value&0x80 == 0x80
+
+	value <<= 1
+
+	if carry {
+		value |= 0x01
+	}
+
+	raiseStatusRegisterFlags(c, value)
+
+	c.writeMemory(address, value)
+}
+
+// ROLAbsolute - Rotate Left. ROL shifts all bits in the memory location
+// specified by the two byte address.
+func ROLAbsolute(c *CPU) {
+	rol(c, c.addressAbsolute)
+}
+
+// ROLAbsoluteX - Rotate Left. ROL shifts all bits in the memory location
+// specified by the two byte address plus the X index register.
+func ROLAbsoluteX(c *CPU) {
+	rol(c, c.addressAbsoluteX)
+}
+
+// ROLZeroPage - Rotate Left. ROL shifts all bits in the memory location
+// specified by the single byte address.
+func ROLZeroPage(c *CPU) {
+	rol(c, c.addressZeroPage)
+}
+
+// ROLZeroPageX - Rotate Left. ROL shifts all bits in the memory location
+// specified by the single byte address plus the X index register.
+func ROLZeroPageX(c *CPU) {
+	rol(c, c.addressZeroPageX)
 }
 
 // ROR - Rotate Right. ROR shifts all bits in the accumulator register.
