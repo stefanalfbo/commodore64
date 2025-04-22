@@ -11,6 +11,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x06: ASLZeroPage,
 	0x08: PHP,
 	0x09: ORAImmediate,
+	0x10: BPL,
 	0x0A: ASLAccumulator,
 	0x0D: ORAAbsolute,
 	0x0E: ASLAbsolute,
@@ -99,6 +100,7 @@ var instructions = map[string]byte{
 	"ASLZeroPage":        0x06,
 	"PHP":                0x08,
 	"ORAImmediate":       0x09,
+	"BPL":                0x10,
 	"ASLAccumulator":     0x0A,
 	"ORAAbsolute":        0x0D,
 	"ASLAbsolute":        0x0E,
@@ -650,6 +652,16 @@ func ASLAbsolute(c *CPU) {
 func PHP(c *CPU) {
 	c.pushOnStack(c.statusRegister.asByte())
 	c.programCounter++
+}
+
+// BPL - Branch if PLus. BPL branches to the given address if the negative
+// flag in the status register is not set.
+func BPL(c *CPU) {
+	c.programCounter++
+
+	if !c.statusRegister.negativeFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
 }
 
 // ASLZeroPageX - Arithmetic Shift Left. ASL shifts all bits in the memory

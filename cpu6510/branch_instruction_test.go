@@ -1,0 +1,31 @@
+package cpu6510
+
+import (
+	"testing"
+)
+
+func TestBPL(t *testing.T) {
+
+	t.Run("Branch if Positive", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.negativeFlag = false
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BPL"))
+
+		if cpu.programCounter != 0x43 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
+		}
+	})
+
+	t.Run("Do Not Branch if Negative", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.negativeFlag = true
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BPL"))
+		if cpu.programCounter != 0x01 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
+		}
+	})
+}
