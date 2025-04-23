@@ -30,6 +30,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x2A: ROLAccumulator,
 	0x2D: ANDAbsolute,
 	0x2E: ROLAbsolute,
+	0x30: BMI,
 	0x31: ANDIndirectIndexed,
 	0x35: ANDZeroPageX,
 	0x36: ROLZeroPageX,
@@ -119,6 +120,7 @@ var instructions = map[string]byte{
 	"ROLAccumulator":     0x2A,
 	"ROLAbsolute":        0x2E,
 	"ANDAbsolute":        0x2D,
+	"BMI":                0x30,
 	"ANDIndirectIndexed": 0x31,
 	"ANDZeroPageX":       0x35,
 	"ROLZeroPageX":       0x36,
@@ -660,6 +662,16 @@ func BPL(c *CPU) {
 	c.programCounter++
 
 	if !c.statusRegister.negativeFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BMI - Branch if Minus. BMI branches to the given address if the negative
+// flag in the status register is set.
+func BMI(c *CPU) {
+	c.programCounter++
+
+	if c.statusRegister.negativeFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }
