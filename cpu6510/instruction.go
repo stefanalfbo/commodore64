@@ -46,6 +46,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x4A: LSRAccumulator,
 	0x4D: EORAbsolute,
 	0x4E: LSRAbsolute,
+	0x50: BVC,
 	0x51: EORIndirectIndexed,
 	0x55: EORZeroPageX,
 	0x56: LSRZeroPageX,
@@ -136,6 +137,7 @@ var instructions = map[string]byte{
 	"LSRAccumulator":     0x4A,
 	"EORAbsolute":        0x4D,
 	"LSRAbsolute":        0x4E,
+	"BVC":                0x50,
 	"EORIndirectIndexed": 0x51,
 	"EORZeroPageX":       0x55,
 	"LSRZeroPageX":       0x56,
@@ -672,6 +674,16 @@ func BMI(c *CPU) {
 	c.programCounter++
 
 	if c.statusRegister.negativeFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BVC - Branch if oVerflow Clear. BVC branches to the given address if the
+// overflow flag in the status register is not set.
+func BVC(c *CPU) {
+	c.programCounter++
+
+	if !c.statusRegister.overflowFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }

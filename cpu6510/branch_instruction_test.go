@@ -54,3 +54,28 @@ func TestBMI(t *testing.T) {
 		}
 	})
 }
+
+func TestBVC(t *testing.T) {
+	t.Run("Branch if Overflow Clear", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.overflowFlag = false
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BVC"))
+
+		if cpu.programCounter != 0x43 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
+		}
+	})
+
+	t.Run("Do Not Branch if Overflow Set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.overflowFlag = true
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BVC"))
+		if cpu.programCounter != 0x01 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
+		}
+	})
+}
