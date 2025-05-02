@@ -59,6 +59,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x68: PLA,
 	0x6A: RORAccumulator,
 	0x6E: RORAbsolute,
+	0x70: BVS,
 	0x76: RORZeroPageX,
 	0x78: SEI,
 	0x7E: RORAbsoluteX,
@@ -86,6 +87,8 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0xF8: SED,
 }
 
+// TODO: Perhaps move this as a helper function
+// for the test cases since it is not used anywhere else
 func InstructionAsHex(name string) byte {
 	instruction, ok := instructions[name]
 	if !ok {
@@ -150,6 +153,7 @@ var instructions = map[string]byte{
 	"PLA":                0x68,
 	"RORAccumulator":     0x6A,
 	"RORAbsolute":        0x6E,
+	"BVS":                0x70,
 	"RORZeroPageX":       0x76,
 	"SEI":                0x78,
 	"RORAbsoluteX":       0x7E,
@@ -684,6 +688,16 @@ func BVC(c *CPU) {
 	c.programCounter++
 
 	if !c.statusRegister.overflowFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BVS - Branch if oVerflow Set. BVS branches to the given address if the
+// overflow flag in the status register is set.
+func BVS(c *CPU) {
+	c.programCounter++
+
+	if c.statusRegister.overflowFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }
