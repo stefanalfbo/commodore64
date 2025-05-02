@@ -70,6 +70,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x9A: TXS,
 	0xA8: TAY,
 	0xAA: TAX,
+	0xB0: BCS,
 	0xBA: TSX,
 	0xB8: CLV,
 	0xC1: CMPIndexedIndirect,
@@ -165,6 +166,7 @@ var instructions = map[string]byte{
 	"TXS":                0x9A,
 	"TAY":                0xA8,
 	"TAX":                0xAA,
+	"BCS":                0xB0,
 	"TSX":                0xBA,
 	"CLV":                0xB8,
 	"CMPIndexedIndirect": 0xC1,
@@ -710,6 +712,16 @@ func BCC(c *CPU) {
 	c.programCounter++
 
 	if !c.statusRegister.carryFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BCS - Branch if Carry Set. BCS branches to the given address if the
+// carry flag in the status register is set.
+func BCS(c *CPU) {
+	c.programCounter++
+
+	if c.statusRegister.carryFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }

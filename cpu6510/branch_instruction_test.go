@@ -129,3 +129,28 @@ func TestBCC(t *testing.T) {
 		}
 	})
 }
+
+func TestBCS(t *testing.T) {
+	t.Run("Branch if Carry Set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.carryFlag = true
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BCS"))
+
+		if cpu.programCounter != 0x43 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
+		}
+	})
+
+	t.Run("Do Not Branch if Carry Clear", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.carryFlag = false
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BCS"))
+		if cpu.programCounter != 0x01 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
+		}
+	})
+}
