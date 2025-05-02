@@ -87,6 +87,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0xDD: CMPAbsoluteX,
 	0xEA: NOP,
 	0xE8: INX,
+	0xF0: BEQ,
 	0xF8: SED,
 }
 
@@ -184,6 +185,7 @@ var instructions = map[string]byte{
 	"CMPAbsoluteX":       0xDD,
 	"NOP":                0xEA,
 	"INX":                0xE8,
+	"BEQ":                0xF0,
 	"SED":                0xF8,
 }
 
@@ -734,6 +736,16 @@ func BNE(c *CPU) {
 	c.programCounter++
 
 	if !c.statusRegister.zeroFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BEQ - Branch if Equal. BEQ branches to the given address if the zero
+// flag in the status register is set.
+func BEQ(c *CPU) {
+	c.programCounter++
+
+	if c.statusRegister.zeroFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }
