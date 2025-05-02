@@ -65,6 +65,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x7E: RORAbsoluteX,
 	0x88: DEY,
 	0x8A: TXA,
+	0x90: BCC,
 	0x98: TYA,
 	0x9A: TXS,
 	0xA8: TAY,
@@ -159,6 +160,7 @@ var instructions = map[string]byte{
 	"RORAbsoluteX":       0x7E,
 	"DEY":                0x88,
 	"TXA":                0x8A,
+	"BCC":                0x90,
 	"TYA":                0x98,
 	"TXS":                0x9A,
 	"TAY":                0xA8,
@@ -698,6 +700,16 @@ func BVS(c *CPU) {
 	c.programCounter++
 
 	if c.statusRegister.overflowFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BCC - Branch if Carry Clear. BCC branches to the given address if the
+// carry flag in the status register is not set.
+func BCC(c *CPU) {
+	c.programCounter++
+
+	if !c.statusRegister.carryFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }
