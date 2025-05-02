@@ -79,6 +79,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0xC9: CMPImmediate,
 	0xCA: DEX,
 	0xCD: CMPAbsolute,
+	0xD0: BNE,
 	0xD1: CMPIndirectIndexed,
 	0xD5: CMPZeroPageX,
 	0xD8: CLD,
@@ -175,6 +176,7 @@ var instructions = map[string]byte{
 	"CMPImmediate":       0xC9,
 	"DEX":                0xCA,
 	"CMPAbsolute":        0xCD,
+	"BNE":                0xD0,
 	"CMPIndirectIndexed": 0xD1,
 	"CMPZeroPageX":       0xD5,
 	"CLD":                0xD8,
@@ -722,6 +724,16 @@ func BCS(c *CPU) {
 	c.programCounter++
 
 	if c.statusRegister.carryFlag {
+		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
+	}
+}
+
+// BNE - Branch if Not Equal. BNE branches to the given address if the
+// zero flag in the status register is not set.
+func BNE(c *CPU) {
+	c.programCounter++
+
+	if !c.statusRegister.zeroFlag {
 		c.programCounter = uint16(int16(c.programCounter) + int16(c.ram[c.programCounter]))
 	}
 }

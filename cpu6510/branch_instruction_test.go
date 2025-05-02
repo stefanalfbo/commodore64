@@ -154,3 +154,28 @@ func TestBCS(t *testing.T) {
 		}
 	})
 }
+
+func TestBNE(t *testing.T) {
+	t.Run("Branch if Not Equal", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.zeroFlag = false
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BNE"))
+
+		if cpu.programCounter != 0x43 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
+		}
+	})
+
+	t.Run("Do Not Branch if Equal", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.zeroFlag = true
+		cpu.ram[cpu.programCounter+1] = 0x42
+
+		cpu.execute(InstructionAsHex("BNE"))
+		if cpu.programCounter != 0x01 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
+		}
+	})
+}
