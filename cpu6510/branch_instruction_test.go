@@ -13,7 +13,7 @@ func TestBPL(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BPL"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -28,6 +28,19 @@ func TestBPL(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Positive and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.negativeFlag = false
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BPL"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBMI(t *testing.T) {
@@ -38,7 +51,7 @@ func TestBMI(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BMI"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -53,18 +66,31 @@ func TestBMI(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Negative and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.negativeFlag = true
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BMI"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBVC(t *testing.T) {
 	t.Run("Branch if Overflow Clear", func(t *testing.T) {
 		cpu := NewCPU()
 		cpu.statusRegister.overflowFlag = false
-		cpu.ram[cpu.programCounter+1] = 0x42
+		cpu.ram[cpu.programCounter+1] = 0x44
 
 		cpu.execute(InstructionAsHex("BVC"))
 
-		if cpu.programCounter != 0x43 {
-			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
+		if cpu.programCounter != 0x46 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x46, cpu.programCounter)
 		}
 	})
 
@@ -78,6 +104,19 @@ func TestBVC(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Overflow Clear and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.overflowFlag = false
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BVC"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBVS(t *testing.T) {
@@ -88,7 +127,7 @@ func TestBVS(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BVS"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -103,6 +142,19 @@ func TestBVS(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Overflow Set and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.overflowFlag = true
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BVS"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBCC(t *testing.T) {
@@ -113,7 +165,7 @@ func TestBCC(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BCC"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -128,6 +180,19 @@ func TestBCC(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Carry Clear and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.carryFlag = false
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BCC"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBCS(t *testing.T) {
@@ -138,7 +203,7 @@ func TestBCS(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BCS"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -153,6 +218,19 @@ func TestBCS(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Carry Set and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.carryFlag = true
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BCS"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBNE(t *testing.T) {
@@ -163,7 +241,7 @@ func TestBNE(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BNE"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -178,6 +256,19 @@ func TestBNE(t *testing.T) {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
 		}
 	})
+
+	t.Run("Branch if Not Equal and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.zeroFlag = false
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BNE"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
+		}
+	})
 }
 
 func TestBEQ(t *testing.T) {
@@ -188,7 +279,7 @@ func TestBEQ(t *testing.T) {
 
 		cpu.execute(InstructionAsHex("BEQ"))
 
-		if cpu.programCounter != 0x43 {
+		if cpu.programCounter != 0x44 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x44, cpu.programCounter)
 		}
 	})
@@ -201,6 +292,19 @@ func TestBEQ(t *testing.T) {
 		cpu.execute(InstructionAsHex("BEQ"))
 		if cpu.programCounter != 0x01 {
 			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0x01, cpu.programCounter)
+		}
+	})
+
+	t.Run("Branch if Equal and jump to negative address", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.statusRegister.zeroFlag = true
+		cpu.programCounter = 0xC002
+		cpu.ram[cpu.programCounter+1] = 0xFC
+
+		cpu.execute(InstructionAsHex("BEQ"))
+
+		if cpu.programCounter != 0xC000 {
+			t.Errorf("Expected PC to be 0x%02X, got 0x%02X", 0xC000, cpu.programCounter)
 		}
 	})
 }

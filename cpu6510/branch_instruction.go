@@ -4,7 +4,10 @@ func branchOnFlag(c *CPU, flag bool) {
 	c.programCounter++
 
 	if flag {
-		c.programCounter = (uint16(int16(c.programCounter) + int16(c.ram[c.programCounter])))
+		operand := int16(int8(c.ram[c.programCounter]))
+		c.programCounter++
+
+		c.programCounter = (uint16(int16(c.programCounter) + operand))
 	}
 }
 
