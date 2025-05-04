@@ -85,7 +85,10 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0xD8: CLD,
 	0xD9: CMPAbsoluteY,
 	0xDD: CMPAbsoluteX,
+	0xE0: CPXImmediate,
+	0xE4: CPXZeroPage,
 	0xEA: NOP,
+	0xEC: CPXAbsolute,
 	0xE8: INX,
 	0xF0: BEQ,
 	0xF8: SED,
@@ -183,7 +186,10 @@ var instructions = map[string]byte{
 	"CLD":                0xD8,
 	"CMPAbsoluteY":       0xD9,
 	"CMPAbsoluteX":       0xDD,
+	"CPXImmediate":       0xE0,
+	"CPXZeroPage":        0xE4,
 	"NOP":                0xEA,
+	"CPXAbsolute":        0xEC,
 	"INX":                0xE8,
 	"BEQ":                0xF0,
 	"SED":                0xF8,
@@ -203,9 +209,7 @@ func setCarryFlag(value byte) bool {
 // raiseStatusRegisterFlags - sets the zero and negative flags in the status
 // register based on the value passed in.
 func raiseStatusRegisterFlags(c *CPU, value byte) {
-	if value == 0 {
-		c.statusRegister.zeroFlag = true
-	}
+	c.statusRegister.zeroFlag = value == 0
 
 	if value&0x80 == 0x80 {
 		c.statusRegister.negativeFlag = true
@@ -877,76 +881,6 @@ func DEX(c *CPU) {
 	raiseStatusRegisterFlags(c, c.xRegister)
 
 	c.programCounter++
-}
-
-func cmp(c *CPU, getValue func() byte) {
-	c.programCounter++
-
-	value := getValue()
-
-	tmp := c.accumulator - value
-
-	raiseStatusRegisterFlags(c, tmp)
-
-	c.statusRegister.carryFlag = c.accumulator >= value
-}
-
-// CMPImmediate - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPImmediate(c *CPU) {
-	cmp(c, c.getValueByImmediateAddressingMode)
-}
-
-// CMPAbsolute - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPAbsolute(c *CPU) {
-	cmp(c, c.getValueByAbsoluteAddressingMode)
-}
-
-// CMPZeroPageX - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPZeroPageX(c *CPU) {
-	cmp(c, c.getValueByZeroPageXAddressingMode)
-}
-
-// CMPAbsoluteY - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPAbsoluteY(c *CPU) {
-	cmp(c, c.getValueByAbsoluteYAddressingMode)
-}
-
-// CMPAbsoluteX - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPAbsoluteX(c *CPU) {
-	cmp(c, c.getValueByAbsoluteXAddressingMode)
-}
-
-// CMPIndexedIndirect - CoMPare. CMP compares the value in the accumulator with
-// the value in memory, and sets the zero and negative flags in the status
-// register based on the result.
-func CMPIndexedIndirect(c *CPU) {
-	cmp(c, c.getValueByIndexedIndirectAddressingMode)
-}
-
-// CMPIndirectIndexed - CoMPare. CMP compares the value in the accumulator with
-// the value in memory, and sets the zero and negative flags in the status
-// register based on the result.
-func CMPIndirectIndexed(c *CPU) {
-	cmp(c, c.getValueByIndirectIndexedAddressingMode)
-
-	c.programCounter++
-}
-
-// CMPZeroPage - CoMPare. CMP compares the value in the accumulator with the
-// value in memory, and sets the zero and negative flags in the status register
-// based on the result.
-func CMPZeroPage(c *CPU) {
-	cmp(c, c.getValueByZeroPageAddressingMode)
 }
 
 // CLD - CLear Decimal flag
