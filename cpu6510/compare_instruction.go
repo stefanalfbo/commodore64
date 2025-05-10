@@ -102,3 +102,36 @@ func CPXAbsolute(c *CPU) {
 func CPXZeroPage(c *CPU) {
 	cpx(c, c.getValueByZeroPageAddressingMode)
 }
+
+func cpy(c *CPU, getValue func() byte) {
+	c.programCounter++
+
+	value := getValue()
+
+	tmp := c.yRegister - value
+
+	raiseStatusRegisterFlags(c, tmp)
+
+	c.statusRegister.carryFlag = c.yRegister >= value
+}
+
+// CPYImmediate - CoMPare Y register. CPY compares the value in the Y index
+// register with the value in memory, and sets the zero and negative flags in
+// the status register based on the result.
+func CPYImmediate(c *CPU) {
+	cpy(c, c.getValueByImmediateAddressingMode)
+}
+
+// CPYAbsolute - CoMPare Y register. CPY compares the value in the Y index
+// register with the value in memory, and sets the zero and negative flags in
+// the status register based on the result.
+func CPYAbsolute(c *CPU) {
+	cpy(c, c.getValueByAbsoluteAddressingMode)
+}
+
+// CPYZeroPage - CoMPare Y register. CPY compares the value in the Y index
+// register with the value in memory, and sets the zero and negative flags in
+// the status register based on the result.
+func CPYZeroPage(c *CPU) {
+	cpy(c, c.getValueByZeroPageAddressingMode)
+}
