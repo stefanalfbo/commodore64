@@ -25,7 +25,15 @@ jobs:
     - name: vet
       run: go vet ./...
 
+    - name: coverage
+      run: go test -coverprofile=coverage.txt ./...
+
     - uses: dominikh/staticcheck-action@v1.3.1
       with:
         version: "2024.1.1"
         install-go: false
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

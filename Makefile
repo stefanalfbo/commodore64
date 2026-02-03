@@ -19,3 +19,6 @@ vet: ## Run the go vet tool
 
 staticcheck: ## Run the staticcheck tool
 	staticcheck ./...
+
+coverage: ## Run tests with coverage
+	go test -coverprofile='coverage.txt' ./...
