@@ -1031,3 +1031,85 @@ func TestCPYAbsolute(t *testing.T) {
 		}
 	})
 }
+
+func TestBITZeroPage(t *testing.T) {
+	t.Run("Negative flag set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0b10000000
+		cpu.statusRegister.negativeFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if !cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be set")
+		}
+	})
+
+	t.Run("Overflow flag set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0b01000000
+		cpu.statusRegister.overflowFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if !cpu.statusRegister.overflowFlag {
+			t.Errorf("Overflow flag should be set")
+		}
+	})
+
+	t.Run("Zero flag set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0x10
+		cpu.accumulator = 0x01
+		cpu.statusRegister.zeroFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if !cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be set")
+		}
+	})
+
+	t.Run("Negative flag not set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0b01111111
+		cpu.statusRegister.negativeFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if cpu.statusRegister.negativeFlag {
+			t.Errorf("Negative flag should be cleared")
+		}
+	})
+
+	t.Run("Overflow flag not set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0b10111111
+		cpu.statusRegister.overflowFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if cpu.statusRegister.overflowFlag {
+			t.Errorf("Overflow flag should be cleared")
+		}
+	})
+
+	t.Run("Zero flag not set", func(t *testing.T) {
+		cpu := NewCPU()
+		cpu.ram[0] = 0x13
+		cpu.ram[0x13] = 0b11111111
+		cpu.accumulator = 0x01
+		cpu.statusRegister.zeroFlag = false
+
+		cpu.execute(InstructionAsHex("BITZeroPage"))
+
+		if cpu.statusRegister.zeroFlag {
+			t.Errorf("Zero flag should be cleared")
+		}
+	})
+}
