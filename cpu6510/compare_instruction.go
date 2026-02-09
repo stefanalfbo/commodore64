@@ -154,6 +154,8 @@ func BITAbsolute(c *CPU) {
 // were ANDed with the accumulator. The negative flag and overflow flag are set to
 // bits 7 and 6 respectively of the value in the address tested.
 func bit(c *CPU, getValue func() byte) {
+	c.programCounter++
+
 	value := getValue()
 
 	c.statusRegister.overflowFlag = value&0b01000000 != 0

@@ -1035,7 +1035,7 @@ func TestCPYAbsolute(t *testing.T) {
 func TestBITZeroPage(t *testing.T) {
 	t.Run("Negative flag set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0b10000000
 		cpu.statusRegister.negativeFlag = false
 
@@ -1048,7 +1048,7 @@ func TestBITZeroPage(t *testing.T) {
 
 	t.Run("Overflow flag set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0b01000000
 		cpu.statusRegister.overflowFlag = false
 
@@ -1061,7 +1061,7 @@ func TestBITZeroPage(t *testing.T) {
 
 	t.Run("Zero flag set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0x10
 		cpu.accumulator = 0x01
 		cpu.statusRegister.zeroFlag = false
@@ -1075,7 +1075,7 @@ func TestBITZeroPage(t *testing.T) {
 
 	t.Run("Negative flag not set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0b01111111
 		cpu.statusRegister.negativeFlag = false
 
@@ -1088,7 +1088,7 @@ func TestBITZeroPage(t *testing.T) {
 
 	t.Run("Overflow flag not set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0b10111111
 		cpu.statusRegister.overflowFlag = false
 
@@ -1101,7 +1101,7 @@ func TestBITZeroPage(t *testing.T) {
 
 	t.Run("Zero flag not set", func(t *testing.T) {
 		cpu := NewCPU()
-		cpu.ram[0] = 0x13
+		cpu.ram[1] = 0x13
 		cpu.ram[0x13] = 0b11111111
 		cpu.accumulator = 0x01
 		cpu.statusRegister.zeroFlag = false
