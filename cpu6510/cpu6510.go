@@ -113,6 +113,8 @@ type CPU struct {
 	// The first entry in the stack is $01FF and the last entry is $0100. When
 	// the stack is empty SP = $FF.
 	stackPointer byte
+	// True when an illegal JAM/KIL opcode has halted the CPU.
+	isJammed bool
 }
 
 // NewCPU creates a new CPU6510 processor.
@@ -173,6 +175,10 @@ func (c *CPU) writeMemory(address uint16, value byte) {
 
 // Execute executes the instruction.
 func (c *CPU) execute(instruction byte) {
+	if c.isJammed {
+		return
+	}
+
 	if runInstruction, ok := lookupInstruction[instruction]; ok {
 		runInstruction(c)
 	} else {
@@ -186,8 +192,8 @@ func (c *CPU) Run() {
 		instruction := c.next()
 		c.execute(instruction)
 
-		// Exit the loop when the instruction is BRK, 0x00.
-		if instruction == 0x00 {
+		// Exit the loop when the instruction is BRK (0x00), or when jammed.
+		if instruction == 0x00 || c.isJammed {
 			break
 		}
 	}
