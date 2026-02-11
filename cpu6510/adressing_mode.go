@@ -88,18 +88,24 @@ func (c *CPU) addressZeroPageX() uint16 {
 	return address
 }
 
-// getValueByIndexedIndirectAddressingMode - returns the value in memory at
-// the address specified by the zero page address plus the X register.
-// The X register is added to the zero page address to get the low byte of
-// the address, and the high byte is the next byte in memory.
-func (c *CPU) getValueByIndexedIndirectAddressingMode() byte {
+// addressIndexedIndirect - returns the address specified by the zero page
+// address plus the X register.
+func (c *CPU) addressIndexedIndirect() uint16 {
 	zeroPageAddress := uint16(uint8(c.ram[c.programCounter] + c.xRegister))
 	c.programCounter++
 
 	lowByte := c.readMemory(zeroPageAddress)
 	highByte := c.readMemory(zeroPageAddress + 1)
 
-	address := ConvertTwoBytesToAddress(highByte, lowByte)
+	return ConvertTwoBytesToAddress(highByte, lowByte)
+}
+
+// getValueByIndexedIndirectAddressingMode - returns the value in memory at
+// the address specified by the zero page address plus the X register.
+// The X register is added to the zero page address to get the low byte of
+// the address, and the high byte is the next byte in memory.
+func (c *CPU) getValueByIndexedIndirectAddressingMode() byte {
+	address := c.addressIndexedIndirect()
 
 	return c.readMemory(address)
 }

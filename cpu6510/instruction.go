@@ -8,6 +8,7 @@ var lookupInstruction = map[byte]InstructionFunc{
 	0x00: BRK,
 	0x01: ORAIndexedIndirect,
 	0x02: JAM,
+	0x03: SLOIndexedIndirect,
 	0x05: ORAZeroPage,
 	0x06: ASLZeroPage,
 	0x08: PHP,
@@ -127,6 +128,7 @@ var instructions = map[string]byte{
 	"ORAIndexedIndirect": 0x01,
 	// 0x12 0x22 0x32 0x42 0x52 0x62 0x72 0x92 0xB2 0xD2 0xF2 are also JAM opcodes
 	"JAM":                0x02,
+	"SLOIndexedIndirect": 0x03,
 	"ORAZeroPage":        0x05,
 	"ASLZeroPage":        0x06,
 	"PHP":                0x08,
